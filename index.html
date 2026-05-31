@@ -639,10 +639,10 @@
             <!-- Sign In Form -->
             <form id="loginForm" class="auth-form active">
                 <div class="form-group" style="margin-bottom: 1.2rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Email Address</label>
+                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Email Address or Mobile Number</label>
                     <div class="input-icon-wrapper" style="position: relative;">
                         <i class="fa-solid fa-envelope" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); font-size: 1rem;"></i>
-                        <input type="email" id="loginEmail" placeholder="player@courtix.com" required style="width: 100%; padding: 0.85rem 1rem 0.85rem 2.8rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; color: #fff; font-family: var(--font-body); font-size: 0.95rem; transition: var(--transition-smooth); outline: none;">
+                        <input type="text" id="loginEmail" placeholder="player@courtix.com or 9876543210" required style="width: 100%; padding: 0.85rem 1rem 0.85rem 2.8rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; color: #fff; font-family: var(--font-body); font-size: 0.95rem; transition: var(--transition-smooth); outline: none;">
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom: 1.5rem;">
@@ -675,6 +675,18 @@
                     <div class="input-icon-wrapper" style="position: relative;">
                         <i class="fa-solid fa-envelope" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); font-size: 1rem;"></i>
                         <input type="email" id="registerEmail" placeholder="player@courtix.com" required style="width: 100%; padding: 0.85rem 1rem 0.85rem 2.8rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; color: #fff; font-family: var(--font-body); font-size: 0.95rem; transition: var(--transition-smooth); outline: none;">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 1.2rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Mobile Number</label>
+                    <div class="input-icon-wrapper" style="position: relative; display: flex; gap: 8px;">
+                        <select id="registerCountryCode" style="padding: 0.85rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; color: #fff; font-family: var(--font-body); font-size: 0.95rem; outline: none; cursor: pointer; width: 85px;">
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+971">🇦🇪 +971</option>
+                        </select>
+                        <input type="tel" id="registerPhone" placeholder="9876543210" pattern="[0-9]{10}" required style="flex-grow: 1; padding: 0.85rem 1rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; color: #fff; font-family: var(--font-body); font-size: 0.95rem; transition: var(--transition-smooth); outline: none;">
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom: 1.5rem;">
@@ -740,12 +752,18 @@
 
             <!-- OTP Name Form (For new user registration via OTP) -->
             <form id="otpNameForm" class="auth-form" style="display: none;">
-                <div class="form-group" style="margin-bottom: 1.5rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Complete Player Profile</label>
-                    <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1rem;">Enter your name to complete your elite registration.</p>
+                <div class="form-group" style="margin-bottom: 1.2rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Full Name</label>
                     <div class="input-icon-wrapper" style="position: relative;">
                         <i class="fa-solid fa-user" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); font-size: 1rem;"></i>
                         <input type="text" id="otpRegName" placeholder="Rohit Sharma" required style="width: 100%; padding: 0.85rem 1rem 0.85rem 2.8rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; color: #fff; font-family: var(--font-body); font-size: 0.95rem; transition: var(--transition-smooth); outline: none;">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Email Address</label>
+                    <div class="input-icon-wrapper" style="position: relative;">
+                        <i class="fa-solid fa-envelope" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); font-size: 1rem;"></i>
+                        <input type="email" id="otpRegEmail" placeholder="player@courtix.com" required style="width: 100%; padding: 0.85rem 1rem 0.85rem 2.8rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; color: #fff; font-family: var(--font-body); font-size: 0.95rem; transition: var(--transition-smooth); outline: none;">
                     </div>
                 </div>
                 <button type="submit" class="btn btn-gold btn-full-width btn-large" style="padding: 1rem; font-size: 1.05rem;">

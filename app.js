@@ -1651,20 +1651,39 @@ function verifyOtpSuccess() {
 // Complete Name Capture & Profile creation
 function handleOtpNameSubmit() {
     const nameInput = document.getElementById("otpRegName");
-    if (!nameInput) return;
+    const emailInput = document.getElementById("otpRegEmail");
+    if (!nameInput || !emailInput) return;
+    
     const name = nameInput.value.trim();
-    if (!name) {
-        showAuthFeedback("Please enter your name.");
+    const email = emailInput.value.trim().toLowerCase();
+    
+    if (!name || !email) {
+        showAuthFeedback("Please fill out all fields.");
+        return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showAuthFeedback("Please enter a valid email address.");
         return;
     }
     
     const registeredUsers = getRegisteredUsers();
+    
+    // Check if email already exists
+    const emailExists = registeredUsers.some(u => u.email === email);
+    if (emailExists) {
+        showAuthFeedback("An account with this email already exists!");
+        return;
+    }
+    
     const phoneFull = otpActiveCountryCode + " " + otpActivePhone;
     
     // Create new player object
     const newUser = {
         name: name,
-        email: `${otpActivePhone}@courtix.com`,
+        email: email,
         phone: phoneFull,
         password: "OTP_USER_" + Math.floor(10000 + Math.random() * 90000),
         level: "Beginner Player"
@@ -1677,6 +1696,7 @@ function handleOtpNameSubmit() {
     showAuthFeedback("Profile registered successfully! Welcome to Courtix.", "success");
     
     nameInput.value = "";
+    emailInput.value = "";
     
     setTimeout(() => {
         closeAuthModal();
@@ -1771,11 +1791,24 @@ function seedDefaultUsers() {
             {
                 name: "Rohit Sharma",
                 email: "rohit@courtix.com",
+                phone: "+91 9876543210",
                 password: "123456",
                 level: "Pro Player"
             }
         ];
         saveRegisteredUsers(defaultUsers);
+    } else {
+        // Upgrade existing Rohit Sharma if missing phone attribute
+        let updated = false;
+        users.forEach(u => {
+            if (u.email === "rohit@courtix.com" && !u.phone) {
+                u.phone = "+91 9876543210";
+                updated = true;
+            }
+        });
+        if (updated) {
+            saveRegisteredUsers(users);
+        }
     }
 }
 
@@ -1783,15 +1816,33 @@ function handleRegisterSubmit() {
     const nameInput = document.getElementById("registerName");
     const emailInput = document.getElementById("registerEmail");
     const passwordInput = document.getElementById("registerPassword");
+    const phoneInput = document.getElementById("registerPhone");
+    const countryCodeInput = document.getElementById("registerCountryCode");
 
-    if (!nameInput || !emailInput || !passwordInput) return;
+    if (!nameInput || !emailInput || !passwordInput || !phoneInput || !countryCodeInput) return;
 
     const name = nameInput.value.trim();
     const email = emailInput.value.trim().toLowerCase();
     const password = passwordInput.value;
+    const phone = phoneInput.value.trim();
+    const countryCode = countryCodeInput.value;
+    const phoneFull = countryCode + " " + phone;
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !phone) {
         showAuthFeedback("Please fill out all fields.");
+        return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showAuthFeedback("Please enter a valid email address.");
+        return;
+    }
+
+    // Validate 10-digit mobile number
+    if (phone.length !== 10 || !/^[0-9]{10}$/.test(phone)) {
+        showAuthFeedback("Please enter a valid 10-digit mobile number.");
         return;
     }
 
@@ -1802,10 +1853,22 @@ function handleRegisterSubmit() {
 
     const registeredUsers = getRegisteredUsers();
     
-    // Check if user already exists
-    const userExists = registeredUsers.some(u => u.email === email);
-    if (userExists) {
+    // Check if user with email already exists
+    const emailExists = registeredUsers.some(u => u.email === email);
+    if (emailExists) {
         showAuthFeedback("An account with this email already exists!");
+        return;
+    }
+
+    // Check if user with phone already exists (extract last 10 digits to compare cleanly)
+    const phoneDigits = phone;
+    const phoneExists = registeredUsers.some(u => {
+        if (!u.phone) return false;
+        const uPhoneDigits = u.phone.replace(/[^0-9]/g, '');
+        return uPhoneDigits.endsWith(phoneDigits);
+    });
+    if (phoneExists) {
+        showAuthFeedback("An account with this mobile number already exists!");
         return;
     }
 
@@ -1813,6 +1876,7 @@ function handleRegisterSubmit() {
     const newUser = {
         name: name,
         email: email,
+        phone: phoneFull,
         password: password,
         level: "Beginner Player"
     };
@@ -1828,6 +1892,7 @@ function handleRegisterSubmit() {
     // Reset input fields
     nameInput.value = "";
     emailInput.value = "";
+    phoneInput.value = "";
     passwordInput.value = "";
 
     // Close modal and proceed to checkout if pending
@@ -1846,19 +1911,40 @@ function handleLoginSubmit() {
 
     if (!emailInput || !passwordInput) return;
 
-    const email = emailInput.value.trim().toLowerCase();
+    const loginInputVal = emailInput.value.trim();
     const password = passwordInput.value;
 
-    if (!email || !password) {
-        showAuthFeedback("Please enter both email and password.");
+    if (!loginInputVal || !password) {
+        showAuthFeedback("Please enter both email/mobile and password.");
         return;
     }
 
     const registeredUsers = getRegisteredUsers();
-    const matchedUser = registeredUsers.find(u => u.email === email && u.password === password);
+    
+    // Normalize input for comparisons
+    const inputLower = loginInputVal.toLowerCase();
+    const inputDigits = loginInputVal.replace(/[^0-9]/g, '');
+
+    const matchedUser = registeredUsers.find(u => {
+        // Match email
+        const emailMatch = u.email && u.email.toLowerCase() === inputLower;
+        
+        // Match phone: can match plain 10-digit number or fully formatted country code number
+        let phoneMatch = false;
+        if (u.phone) {
+            const uPhoneDigits = u.phone.replace(/[^0-9]/g, '');
+            if (inputDigits.length >= 10 && uPhoneDigits.endsWith(inputDigits)) {
+                phoneMatch = true;
+            } else if (u.phone.toLowerCase() === inputLower) {
+                phoneMatch = true;
+            }
+        }
+        
+        return (emailMatch || phoneMatch) && u.password === password;
+    });
 
     if (!matchedUser) {
-        showAuthFeedback("Invalid email or password. Please try again.");
+        showAuthFeedback("Invalid email/mobile or password. Please try again.");
         return;
     }
 
