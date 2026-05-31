@@ -2461,3 +2461,39 @@ input:checked + .slider:before {
         grid-template-columns: 1fr;
     }
 }
+
+/* ==========================================================================
+   OTP AUTHENTICATION SYSTEM PREMIUM STYLING ADDITIONS
+   ========================================================================== */
+
+.otp-field {
+    transition: var(--transition-smooth);
+}
+.otp-field:focus {
+    border-color: var(--color-gold) !important;
+    box-shadow: 0 0 15px rgba(197, 255, 26, 0.45) !important;
+    background: rgba(197, 255, 26, 0.05) !important;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes slideOutDown {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+}
+

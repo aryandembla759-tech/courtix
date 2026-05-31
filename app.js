@@ -1302,6 +1302,12 @@ function updateUserUIState() {
 // Variable to store booking action that triggered the login modal, so we can resume it afterwards
 let pendingBookingAction = false;
 
+// OTP Authentication States
+let generatedOTPCode = null;
+let otpActivePhone = null;
+let otpActiveCountryCode = null;
+let otpTimerInterval = null;
+
 function bindAuthEvents() {
     const sidebarUserBlock = document.getElementById("sidebarUserBlock");
     const authModal = document.getElementById("authModal");
@@ -1309,8 +1315,17 @@ function bindAuthEvents() {
     
     const authTabLogin = document.getElementById("authTabLogin");
     const authTabRegister = document.getElementById("authTabRegister");
+    
     const loginForm = document.getElementById("loginForm");
     const registerForm = document.getElementById("registerForm");
+    const otpRequestForm = document.getElementById("otpRequestForm");
+    const otpVerifyForm = document.getElementById("otpVerifyForm");
+    const otpNameForm = document.getElementById("otpNameForm");
+    
+    const toggleOTPLogin = document.getElementById("toggleOTPLogin");
+    const toggleOTPRegister = document.getElementById("toggleOTPRegister");
+    const backToPasswordLogin = document.getElementById("backToPasswordLogin");
+    const resendOtpBtn = document.getElementById("resendOtpBtn");
     
     const logoutBtn = document.getElementById("sidebarLogoutBtn");
 
@@ -1332,31 +1347,196 @@ function bindAuthEvents() {
     }
 
     // Modal tabs toggle
-    if (authTabLogin && authTabRegister && loginForm && registerForm) {
+    if (authTabLogin && authTabRegister) {
         authTabLogin.addEventListener("click", () => {
             authTabLogin.classList.add("active");
             authTabRegister.classList.remove("active");
+            
+            // Show login form, hide all other forms
             loginForm.style.display = "block";
             loginForm.classList.add("active");
             registerForm.style.display = "none";
             registerForm.classList.remove("active");
+            otpRequestForm.style.display = "none";
+            otpVerifyForm.style.display = "none";
+            otpNameForm.style.display = "none";
             
             document.getElementById("authModalTitle").innerText = "Welcome Player";
             document.getElementById("authModalSubtitle").innerText = "Join the elite Courtix sports community";
             clearAuthFeedback();
+            clearInterval(otpTimerInterval);
         });
 
         authTabRegister.addEventListener("click", () => {
             authTabRegister.classList.add("active");
             authTabLogin.classList.remove("active");
+            
+            // Show register form, hide all other forms
             registerForm.style.display = "block";
             registerForm.classList.add("active");
             loginForm.style.display = "none";
             loginForm.classList.remove("active");
+            otpRequestForm.style.display = "none";
+            otpVerifyForm.style.display = "none";
+            otpNameForm.style.display = "none";
             
             document.getElementById("authModalTitle").innerText = "Create Player Profile";
             document.getElementById("authModalSubtitle").innerText = "Register your account to start playing";
             clearAuthFeedback();
+            clearInterval(otpTimerInterval);
+        });
+    }
+
+    // Toggle to OTP Request Form
+    if (toggleOTPLogin) {
+        toggleOTPLogin.addEventListener("click", (e) => {
+            e.preventDefault();
+            loginForm.style.display = "none";
+            loginForm.classList.remove("active");
+            otpRequestForm.style.display = "block";
+            otpRequestForm.classList.add("active");
+            
+            document.getElementById("authModalTitle").innerText = "OTP Verification";
+            document.getElementById("authModalSubtitle").innerText = "Verify your identity via mobile OTP";
+            clearAuthFeedback();
+        });
+    }
+    
+    if (toggleOTPRegister) {
+        toggleOTPRegister.addEventListener("click", (e) => {
+            e.preventDefault();
+            registerForm.style.display = "none";
+            registerForm.classList.remove("active");
+            otpRequestForm.style.display = "block";
+            otpRequestForm.classList.add("active");
+            
+            document.getElementById("authModalTitle").innerText = "OTP Verification";
+            document.getElementById("authModalSubtitle").innerText = "Verify your identity via mobile OTP";
+            clearAuthFeedback();
+        });
+    }
+
+    // Toggle back to Password Login Form
+    if (backToPasswordLogin) {
+        backToPasswordLogin.addEventListener("click", (e) => {
+            e.preventDefault();
+            otpRequestForm.style.display = "none";
+            otpRequestForm.classList.remove("active");
+            loginForm.style.display = "block";
+            loginForm.classList.add("active");
+            
+            document.getElementById("authModalTitle").innerText = "Welcome Player";
+            document.getElementById("authModalSubtitle").innerText = "Join the elite Courtix sports community";
+            clearAuthFeedback();
+        });
+    }
+
+    // OTP 4-Digit Input Autofocus transition mechanism
+    const otpFields = document.querySelectorAll(".otp-field");
+    otpFields.forEach((field, index) => {
+        field.addEventListener("input", (e) => {
+            // Keep numeric only
+            field.value = field.value.replace(/[^0-9]/g, "");
+            if (field.value.length === 1 && index < 3) {
+                otpFields[index + 1].focus();
+            }
+        });
+        field.addEventListener("keydown", (e) => {
+            if (e.key === "Backspace" && field.value.length === 0 && index > 0) {
+                otpFields[index - 1].focus();
+            }
+        });
+    });
+
+    // Handle OTP Code request submit
+    if (otpRequestForm) {
+        otpRequestForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const phoneInput = document.getElementById("otpPhone");
+            const codeSelector = document.getElementById("otpCountryCode");
+            
+            if (!phoneInput || !codeSelector) return;
+            const phone = phoneInput.value.trim();
+            const countryCode = codeSelector.value;
+            
+            if (!phone || phone.length !== 10) {
+                showAuthFeedback("Please enter a valid 10-digit mobile number.");
+                return;
+            }
+            
+            // Set active states
+            otpActivePhone = phone;
+            otpActiveCountryCode = countryCode;
+            
+            // Generate random 4-digit code
+            generatedOTPCode = String(Math.floor(1000 + Math.random() * 9000));
+            
+            // Clear inputs inside verification screen
+            otpFields.forEach(f => f.value = "");
+            
+            // Smoothly switch forms
+            otpRequestForm.style.display = "none";
+            otpRequestForm.classList.remove("active");
+            otpVerifyForm.style.display = "block";
+            otpVerifyForm.classList.add("active");
+            
+            document.getElementById("authModalSubtitle").innerText = `Code sent to ${countryCode} ${phone.slice(0, 3)}•••${phone.slice(-3)}`;
+            clearAuthFeedback();
+            
+            // Trigger customVolt Toast
+            showOtpToast(generatedOTPCode);
+            
+            // Start countdown Resend timer
+            startOtpCountdown();
+            
+            // Focus on first input box automatically
+            setTimeout(() => otpFields[0].focus(), 150);
+        });
+    }
+
+    // Handle Resend OTP click
+    if (resendOtpBtn) {
+        resendOtpBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            generatedOTPCode = String(Math.floor(1000 + Math.random() * 9000));
+            showOtpToast(generatedOTPCode);
+            startOtpCountdown();
+            otpFields.forEach(f => f.value = "");
+            otpFields[0].focus();
+            showAuthFeedback("Verification code resent!", "success");
+        });
+    }
+
+    // Handle OTP Verify Code Submit
+    if (otpVerifyForm) {
+        otpVerifyForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            
+            // Collate 4 digit code
+            const inputCode = Array.from(otpFields).map(f => f.value).join("");
+            if (inputCode.length !== 4) {
+                showAuthFeedback("Please enter all 4 verification digits.");
+                return;
+            }
+            
+            if (inputCode !== generatedOTPCode) {
+                showAuthFeedback("Incorrect verification code. Please try again.");
+                // Clear fields and focus first
+                otpFields.forEach(f => f.value = "");
+                otpFields[0].focus();
+                return;
+            }
+            
+            clearInterval(otpTimerInterval);
+            verifyOtpSuccess();
+        });
+    }
+
+    // Handle OTP Name Register Submit
+    if (otpNameForm) {
+        otpNameForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            handleOtpNameSubmit();
         });
     }
 
@@ -1392,6 +1572,118 @@ function bindAuthEvents() {
     }
 }
 
+// In-App Toast secure notifier
+function showOtpToast(code) {
+    const toast = document.getElementById("otpToastAlert");
+    const codeEl = document.getElementById("toastOtpCode");
+    if (!toast || !codeEl) return;
+    
+    codeEl.innerText = code;
+    toast.style.display = "flex";
+    toast.style.animation = "slideInUp 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards";
+    
+    if (toast._timeout) clearTimeout(toast._timeout);
+    
+    toast._timeout = setTimeout(() => {
+        toast.style.animation = "slideOutDown 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards";
+        setTimeout(() => {
+            toast.style.display = "none";
+        }, 400);
+    }, 8000);
+}
+
+// Countdown timer loop
+function startOtpCountdown() {
+    const countdownEl = document.getElementById("otpCountdown");
+    const resendBtn = document.getElementById("resendOtpBtn");
+    if (!countdownEl || !resendBtn) return;
+    
+    clearInterval(otpTimerInterval);
+    resendBtn.style.display = "none";
+    countdownEl.style.display = "inline-block";
+    
+    let timeLeft = 30;
+    countdownEl.innerText = `Resend OTP in ${timeLeft}s`;
+    
+    otpTimerInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+            clearInterval(otpTimerInterval);
+            countdownEl.style.display = "none";
+            resendBtn.style.display = "inline-block";
+        } else {
+            countdownEl.innerText = `Resend OTP in ${timeLeft}s`;
+        }
+    }, 1000);
+}
+
+// Handler on OTP Verification Success
+function verifyOtpSuccess() {
+    const registeredUsers = getRegisteredUsers();
+    const phoneFull = otpActiveCountryCode + " " + otpActivePhone;
+    
+    const existingUser = registeredUsers.find(u => u.phone === phoneFull);
+    
+    if (existingUser) {
+        loginUser(existingUser);
+        showAuthFeedback("Verification successful! Signed in.", "success");
+        
+        setTimeout(() => {
+            closeAuthModal();
+            if (pendingBookingAction) openCheckout();
+        }, 1200);
+    } else {
+        // Toggle forms
+        document.getElementById("otpVerifyForm").style.display = "none";
+        document.getElementById("otpNameForm").style.display = "block";
+        
+        document.getElementById("authModalTitle").innerText = "Enter Name";
+        document.getElementById("authModalSubtitle").innerText = "Complete your new player registration";
+        clearAuthFeedback();
+        
+        setTimeout(() => {
+            const nameInput = document.getElementById("otpRegName");
+            if (nameInput) nameInput.focus();
+        }, 150);
+    }
+}
+
+// Complete Name Capture & Profile creation
+function handleOtpNameSubmit() {
+    const nameInput = document.getElementById("otpRegName");
+    if (!nameInput) return;
+    const name = nameInput.value.trim();
+    if (!name) {
+        showAuthFeedback("Please enter your name.");
+        return;
+    }
+    
+    const registeredUsers = getRegisteredUsers();
+    const phoneFull = otpActiveCountryCode + " " + otpActivePhone;
+    
+    // Create new player object
+    const newUser = {
+        name: name,
+        email: `${otpActivePhone}@courtix.com`,
+        phone: phoneFull,
+        password: "OTP_USER_" + Math.floor(10000 + Math.random() * 90000),
+        level: "Beginner Player"
+    };
+    
+    registeredUsers.push(newUser);
+    saveRegisteredUsers(registeredUsers);
+    
+    loginUser(newUser);
+    showAuthFeedback("Profile registered successfully! Welcome to Courtix.", "success");
+    
+    nameInput.value = "";
+    
+    setTimeout(() => {
+        closeAuthModal();
+        if (pendingBookingAction) openCheckout();
+    }, 1200);
+}
+
 function openAuthModal(isRedirectFromBooking = false) {
     pendingBookingAction = isRedirectFromBooking;
     const authModal = document.getElementById("authModal");
@@ -1417,6 +1709,7 @@ function closeAuthModal() {
         authModal.classList.remove("active");
     }
     pendingBookingAction = false;
+    clearInterval(otpTimerInterval);
 }
 
 function clearAuthFeedback() {
