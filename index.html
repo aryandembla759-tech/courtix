@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Courtix - Premium sports court and turf booking platform in Udaipur. Book Football turfs, Cricket nets, Badminton courts, and more instantly.">
+    <meta name="keywords" content="Courtix, Udaipur Turf Booking, Sports Court Udaipur, Cricket Udaipur, Football Turf Udaipur, Badminton Court, Pickleball Court Booking">
+    <title>Courtix | Premium Sports Court Booking Udaipur</title>
+    
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icon Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Theme Styling -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Desktop Sidebar Navigation (Simplified) -->
+        <aside class="sidebar" id="appSidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">
+                    <img src="courtix_logo.png" alt="Courtix Logo" style="height: 38px; width: 38px; border-radius: 8px; box-shadow: 0 0 12px rgba(197, 255, 26, 0.4); vertical-align: middle;">
+                </div>
+                <div class="logo-text">COURT<span>IX</span></div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#home" class="nav-item active" data-tab="home">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#explore" class="nav-item" data-tab="explore">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>Explore Courts</span>
+                </a>
+                <a href="#bookings" class="nav-item" data-tab="bookings">
+                    <i class="fa-solid fa-receipt"></i>
+                    <span>My Bookings</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer" id="sidebarUserBlock" style="cursor: pointer; position: relative;">
+                <div class="user-avatar-glow">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop" alt="User Profile" id="userProfilePic">
+                </div>
+                <div class="user-info" style="flex-grow: 1;">
+                    <span class="user-name" id="sidebarUserName">Guest Player</span>
+                    <span class="user-level" id="sidebarUserLevel">Click to Sign In</span>
+                </div>
+                <i class="fa-solid fa-right-from-bracket" id="sidebarLogoutBtn" style="display: none; cursor: pointer; font-size: 1.1rem; color: var(--color-text-muted); transition: var(--transition-smooth);" title="Sign Out" onclick="event.stopPropagation();"></i>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header (Simplified) -->
+            <header class="app-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
+                    <div class="location-badge">
+                        <i class="fa-solid fa-location-dot gold-glow-text"></i>
+                        <select id="locationSelector">
+                            <option value="udaipur">Udaipur, RJ</option>
+                            <option value="central">Central Area (Mali Colony)</option>
+                            <option value="shobhagpura">Shobhagpura, Udaipur</option>
+                            <option value="hiranmagri">Hiran Magri, Udaipur</option>
+                            <option value="bhuwana">Bhuwana, Udaipur</option>
+                            <option value="fatehsagar">Fateh Sagar, Udaipur</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="notification-bell">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="notification-indicator"></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dynamic View Containers -->
+            <div class="view-panel active" id="view-home">
+                <!-- HERO BANNER -->
+                <section class="hero-section">
+                    <div class="hero-content">
+                        <span class="hero-tagline gold-text"><i class="fa-solid fa-bolt"></i> Elite Sports Venue Hub</span>
+                        <h1 class="hero-title">Elevate Your Game at Udaipur's Premium Arenas</h1>
+                        <p class="hero-desc">Instantly search, select, and book premium football turfs, Cricket pitches, wooden badminton courts, premium pickleball courts, and basketball complexes across Udaipur.</p>
+                        
+                        <!-- Search Bar -->
+                        <div class="glass-search-bar">
+                            <div class="search-field">
+                                <i class="fa-solid fa-futbol search-icon"></i>
+                                <div class="select-wrapper">
+                                    <label>Sport Category</label>
+                                    <select id="searchSport">
+                                        <option value="all">All Sports</option>
+                                        <option value="football">Football Turf</option>
+                                        <option value="cricket">Cricket</option>
+                                        <option value="badminton">Badminton</option>
+                                        <option value="pickleball">Pickleball</option>
+                                        <option value="basketball">Basketball</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="search-field-divider"></div>
+                            <div class="search-field">
+                                <i class="fa-solid fa-calendar search-icon"></i>
+                                <div class="select-wrapper">
+                                    <label>Date Selection</label>
+                                    <input type="date" id="searchDate">
+                                </div>
+                            </div>
+                            <div class="search-field-divider"></div>
+                            <div class="search-field">
+                                <i class="fa-solid fa-location-arrow search-icon"></i>
+                                <div class="select-wrapper">
+                                    <label>Sub-Area</label>
+                                    <select id="searchRegion">
+                                        <option value="all">Any Area</option>
+                                        <option value="central">Central Area (Mali Colony)</option>
+                                        <option value="shobhagpura">Shobhagpura</option>
+                                        <option value="bhuwana">Bhuwana</option>
+                                        <option value="hiranmagri">Hiran Magri</option>
+                                        <option value="fatehsagar">Fateh Sagar</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="btn btn-gold search-btn" id="heroSearchBtn">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <span>Search</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="hero-visual">
+                        <div class="gold-ring-glow"></div>
+                    </div>
+                </section>
+
+                <!-- SPORTS SUBCATEGORIES HUB -->
+                <section class="categories-section">
+                    <h2 class="section-title">Select Your <span>Sport Category</span></h2>
+                    <div class="sports-grid">
+                        <div class="sport-card" data-sport="football">
+                            <div class="sport-icon-holder"><i class="fa-solid fa-futbol"></i></div>
+                            <h3>Football Turf</h3>
+                            <p>5v5 & 7v7 FIFA Quality</p>
+                            <span class="explore-link">Book Now <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                        <div class="sport-card" data-sport="cricket">
+                            <div class="sport-icon-holder"><i class="fa-solid fa-baseball-bat-ball"></i></div>
+                            <h3>Cricket</h3>
+                            <p>Premium Turf Nets</p>
+                            <span class="explore-link">Book Now <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                        <div class="sport-card" data-sport="badminton">
+                            <div class="sport-icon-holder"><i class="fa-solid fa-shuttlecock"><img src="https://cdn-icons-png.flaticon.com/512/3719/3719918.png" style="width:24px; filter:invert(1);" alt=""></i></div>
+                            <h3>Badminton</h3>
+                            <p>Teak Wooden & Synthetic</p>
+                            <span class="explore-link">Book Now <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                        <div class="sport-card" data-sport="pickleball">
+                            <div class="sport-icon-holder"><i class="fa-solid fa-table-tennis-paddle-ball"></i></div>
+                            <h3>Pickleball</h3>
+                            <p>Premium Outdoor & Indoor Courts</p>
+                            <span class="explore-link">Book Now <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                        <div class="sport-card" data-sport="basketball">
+                            <div class="sport-icon-holder"><i class="fa-solid fa-basketball"></i></div>
+                            <h3>Basketball</h3>
+                            <p>Premium Indoor Arenas</p>
+                            <span class="explore-link">Book Now <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- POWERHOUSE BOOKING ADVANTAGES -->
+                <section class="features-section">
+                    <div class="features-header text-center">
+                        <h2 class="section-title">The <span>Courtix Advantage</span></h2>
+                        <p class="section-subtitle">A high-performance online booking experience designed for local players</p>
+                    </div>
+                    <div class="features-grid">
+                        <div class="feature-glow-card">
+                            <div class="feature-icon gold-glow-text"><i class="fa-solid fa-circle-check"></i></div>
+                            <h3>100% Instant Confirmation</h3>
+                            <p>Every court slot is linked directly to our live facility database, ensuring zero double bookings. When you hit pay, your venue timing is immediately locked with absolute certainty.</p>
+                        </div>
+                        <div class="feature-glow-card">
+                            <div class="feature-icon gold-glow-text"><i class="fa-solid fa-bolt"></i></div>
+                            <h3>Secured Payment Gates</h3>
+                            <p>Complete your booking securely via simulated UPI scanners or credit/debit card processing. Fully encrypted, fast checkout pathways ensure your convenience.</p>
+                        </div>
+                        <div class="feature-glow-card">
+                            <div class="feature-icon gold-glow-text"><i class="fa-solid fa-ticket"></i></div>
+                            <h3>Smart Boarding Pass</h3>
+                            <p>Access your bookings inside a beautifully perforated digital ticket containing unique barcodes. Present this at the venue entrance for hassle-free entry.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- FEATURED COURTS NEAR UDAIPUR -->
+                <section class="featured-venues">
+                    <div class="section-header-flex">
+                        <h2 class="section-title">Trending Arenas in <span>Udaipur</span></h2>
+                        <button class="btn btn-outline" id="viewAllVenuesBtn">Explore All Courts</button>
+                    </div>
+                    <div class="venues-grid-horizontal" id="featuredVenuesList">
+                        <!-- Populated by app.js -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- View: Explore Courts & Advanced Listings -->
+            <div class="view-panel" id="view-explore">
+                <section class="explore-header">
+                    <h2 class="section-title">Advanced Court <span>Listing</span></h2>
+                    <p class="section-subtitle">Search, filter, and discover available sports facility complexes in Udaipur</p>
+                </section>
+
+                <!-- Filters Layout -->
+                <section class="explore-layout">
+                    <aside class="filters-sidebar">
+                        <div class="filter-group">
+                            <h3><i class="fa-solid fa-sliders gold-glow-text"></i> Filter Settings</h3>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label>Filter By Sport</label>
+                            <div class="filter-options" id="filterSportOptions">
+                                <button class="filter-pill active" data-sport="all">All Sports</button>
+                                <button class="filter-pill" data-sport="football">Football</button>
+                                <button class="filter-pill" data-sport="cricket">Cricket</button>
+                                <button class="filter-pill" data-sport="badminton">Badminton</button>
+                                <button class="filter-pill" data-sport="pickleball">Pickleball</button>
+                                <button class="filter-pill" data-sport="basketball">Basketball</button>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Udaipur Sub-Region</label>
+                            <select id="filterRegion">
+                                <option value="all">All Regions</option>
+                                <option value="central">Central Area (Mali Colony)</option>
+                                <option value="shobhagpura">Shobhagpura</option>
+                                <option value="bhuwana">Bhuwana</option>
+                                <option value="hiranmagri">Hiran Magri</option>
+                                <option value="fatehsagar">Fateh Sagar / Rani Road</option>
+                                <option value="university">University Road</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Pricing Range (per Hour)</label>
+                            <div class="range-values">
+                                <span id="priceMin">₹300</span>
+                                <span id="priceMax">₹1,500</span>
+                            </div>
+                            <input type="range" id="filterPriceRange" min="300" max="1500" value="1500" step="50">
+                        </div>
+
+                        <button class="btn btn-gold btn-full-width" id="resetFiltersBtn">Reset Filters</button>
+                    </aside>
+
+                    <!-- Listings Display -->
+                    <div class="explore-results-wrapper">
+                        <div class="results-meta">
+                            <span id="resultsCount">Showing 16 sports arenas in Udaipur</span>
+                            <div class="sort-selector">
+                                <label>Sort By: </label>
+                                <select id="sortSelector">
+                                    <option value="featured">Featured Popular</option>
+                                    <option value="price-low">Price: Low to High</option>
+                                    <option value="price-high">Price: High to Low</option>
+                                    <option value="rating">Top Rated</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="venues-listing-grid" id="mainVenuesList">
+                            <!-- Populated dynamically via app.js -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- View: My Bookings Dashboard (Simplified) -->
+            <div class="view-panel" id="view-bookings">
+                <section class="profile-header">
+                    <h2>My Booking <span>Dashboard</span></h2>
+                    <p>Track your active court slot bookings, upcoming play sessions, and digital boarding tickets.</p>
+                </section>
+
+                <div class="dashboard-stats-grid" style="grid-template-columns: repeat(2, 1fr);">
+                    <div class="stat-card">
+                        <span class="stat-label">Upcoming Sessions Booked</span>
+                        <span class="stat-number" id="statBookedCount">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Total Completed Bookings</span>
+                        <span class="stat-number" id="statPastCount">0</span>
+                    </div>
+                </div>
+
+                <section class="bookings-lists-wrapper">
+                    <div class="bookings-tab-headers">
+                        <button class="booking-tab active" data-subtab="upcoming">Active Booked Passes</button>
+                        <button class="booking-tab" data-subtab="past">Completed Matches</button>
+                    </div>
+
+                    <div class="bookings-tab-content active" id="subtab-upcoming">
+                        <div class="bookings-vertical-list" id="upcomingMatchesList">
+                            <!-- Empty states or items -->
+                        </div>
+                    </div>
+                    
+                    <div class="bookings-tab-content" id="subtab-past">
+                        <div class="bookings-vertical-list" id="pastMatchesList">
+                            <!-- Empty states or items -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Mobile Bottom Navigation Bar (Simplified) -->
+        <nav class="mobile-nav">
+            <a href="#home" class="mobile-nav-item active" data-tab="home">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="#explore" class="mobile-nav-item" data-tab="explore">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Explore</span>
+            </a>
+            <a href="#bookings" class="mobile-nav-item" data-tab="bookings">
+                <i class="fa-solid fa-receipt"></i>
+                <span>Bookings</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- MAIN OVERLAY MODAL: COURT DETAIL & BOOKING ENGINE (Simplified) -->
+    <div class="modal-overlay" id="bookingModal">
+        <div class="modal-container glass-panel">
+            <button class="modal-close" id="closeBookingModalBtn"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="modal-split-layout">
+                <!-- Left Column: Court Info & Highlights -->
+                <div class="modal-court-info">
+                    <div class="modal-badge-row">
+                        <span class="modal-badge" id="modalVenueSport">FOOTBALL</span>
+                        <span class="modal-badge-stars"><i class="fa-solid fa-star gold-glow-text"></i> <span id="modalVenueRating">4.8</span></span>
+                    </div>
+                    <h2 id="modalVenueName">Udaipur Turf Club</h2>
+                    <p class="modal-location"><i class="fa-solid fa-location-dot gold-glow-text"></i> <span id="modalVenueLocation">Shobhagpura, Udaipur</span></p>
+                    
+                    <div class="modal-court-gallery" id="modalCourtGallery">
+                        <div class="modal-gallery-track" id="modalGalleryTrack">
+                            <!-- Populated dynamically by app.js -->
+                        </div>
+                        <button class="modal-gallery-btn btn-prev" id="modalGalleryPrev"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button class="modal-gallery-btn btn-next" id="modalGalleryNext"><i class="fa-solid fa-chevron-right"></i></button>
+                        <div class="modal-gallery-dots" id="modalGalleryDots">
+                            <!-- Populated dynamically by app.js -->
+                        </div>
+                    </div>
+                    
+                    <p id="modalVenueDesc" style="color: var(--color-text-muted); font-size: 0.95rem; line-height: 1.6;"></p>
+                    
+                    <div class="modal-amenities-row" id="modalVenueAmenities">
+                        <!-- Amenities icons -->
+                    </div>
+
+                    <div class="modal-pricing-box">
+                        <span class="price-label">Price per Hour</span>
+                        <span class="price-amount gold-text" id="modalVenuePrice">₹1,000</span>
+                    </div>
+                </div>
+
+                <!-- Right Column: Interactive Booking Engine (Simplified) -->
+                <div class="modal-booking-engine">
+                    <h3>Select Date & Timings</h3>
+                    
+                    <!-- Date Selector Carousel -->
+                    <div class="date-carousel" id="bookingDateCarousel">
+                        <!-- Dynamic dates -->
+                    </div>
+
+                    <!-- Slots Selection -->
+                    <div class="slots-container" style="max-height: 380px;">
+                        <div class="slots-header">
+                            <span>Available Time Slots</span>
+                            <span class="slot-instruction">Select one or more continuous hours</span>
+                        </div>
+                        
+                        <div class="slots-section-title">Morning Sessions</div>
+                        <div class="slots-grid" id="slotsMorning">
+                            <!-- Slots -->
+                        </div>
+
+                        <div class="slots-section-title">Afternoon Sessions</div>
+                        <div class="slots-grid" id="slotsAfternoon">
+                            <!-- Slots -->
+                        </div>
+
+                        <div class="slots-section-title">Evening Sessions</div>
+                        <div class="slots-grid" id="slotsEvening">
+                            <!-- Slots -->
+                        </div>
+
+                        <div class="slots-section-title">Night Lights</div>
+                        <div class="slots-grid" id="slotsNight">
+                            <!-- Slots -->
+                        </div>
+                    </div>
+
+                    <!-- Submit & Reserve (Direct) -->
+                    <div class="booking-action-bar">
+                        <div class="total-estimation">
+                            <span>Grand Total:</span>
+                            <span id="bookingTotalCost">₹1,000</span>
+                        </div>
+                        <button class="btn btn-gold btn-large" id="confirmSlotsBtn" disabled>
+                            <span>Book Court Slot</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOCK TRANSACTION & CHECKOUT OVERLAY (Simplified) -->
+    <div class="modal-overlay" id="checkoutModal">
+        <div class="modal-container glass-panel modal-medium">
+            <button class="modal-close" id="closeCheckoutBtn"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="checkout-header text-center">
+                <i class="fa-solid fa-shield-halved gold-glow-text checkout-icon"></i>
+                <h2>Secure Checkout</h2>
+                <p>Complete booking reservation for <span id="checkoutVenueName" class="gold-text">Udaipur Turf Club</span></p>
+            </div>
+
+            <div class="checkout-details-summary glass-panel" style="margin-bottom: 1rem;">
+                <div class="summary-line">
+                    <span>Sports Facility Court:</span>
+                    <strong id="checkoutSlotDetails">Football - 29th May (06:00 PM - 07:00 PM)</strong>
+                </div>
+                <div class="summary-line" id="checkoutDiscountRow" style="display: none; color: var(--color-gold);">
+                    <span>Discount Amount:</span>
+                    <strong id="checkoutDiscountAmount">-₹0</strong>
+                </div>
+                <div class="summary-line" style="border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 0.8rem; margin-top: 0.4rem;">
+                    <span>Total Court Price:</span>
+                    <strong id="checkoutTotalCourtPrice">₹1,000</strong>
+                </div>
+                <div class="summary-line highlight-gold" style="font-size: 1.15rem;">
+                    <span>10% Advance (Pay Online):</span>
+                    <strong id="checkoutAdvancePayable">₹100</strong>
+                </div>
+                <div class="summary-line" style="color: var(--color-text-muted); font-size: 0.85rem;">
+                    <span>Remaining Balance (Pay at Venue):</span>
+                    <strong id="checkoutRemainingBalance">₹900</strong>
+                </div>
+            </div>
+
+            <!-- Coupon Code Field -->
+            <div class="coupon-section" style="margin-bottom: 1.2rem; display: flex; gap: 8px;">
+                <input type="text" id="couponCodeInput" placeholder="ENTER COUPON CODE (e.g. SPORTY20)" style="flex-grow: 1; padding: 0.7rem 1rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; color: #fff; font-family: var(--font-body); font-size: 0.85rem; outline: none; transition: var(--transition-smooth); text-transform: uppercase;">
+                <button type="button" class="btn btn-outline" id="applyCouponBtn" style="padding: 0.7rem 1.2rem; font-size: 0.85rem; font-weight: 600; border-radius: 12px; transition: var(--transition-smooth);">Apply</button>
+            </div>
+            <div id="couponFeedbackMsg" style="display: none; font-size: 0.8rem; margin-top: -8px; margin-bottom: 1.2rem; font-weight: 600; padding: 0.4rem 0.8rem; border-radius: 8px; text-align: left;"></div>
+
+            <!-- Payment Methods Select -->
+            <div class="payment-tabs-headers">
+                <button class="payment-tab active" data-method="upi">
+                    <i class="fa-solid fa-mobile-screen"></i> UPI Scan Code
+                </button>
+                <button class="payment-tab" data-method="card">
+                    <i class="fa-solid fa-credit-card"></i> Credit / Debit Card
+                </button>
+            </div>
+
+            <!-- Method Content: UPI -->
+            <div class="payment-tab-content active" id="method-upi">
+                <div class="upi-method-body text-center">
+                    <p class="instruction">Scan the generated QR Code with GPay, PhonePe, Paytm, or BHIM</p>
+                    <div class="qr-code-wrapper">
+                        <div class="simulated-qr">
+                            <i class="fa-solid fa-qrcode"></i>
+                            <div class="qr-corner-border border-tl"></div>
+                            <div class="qr-corner-border border-tr"></div>
+                            <div class="qr-corner-border border-bl"></div>
+                            <div class="qr-corner-border border-br"></div>
+                        </div>
+                    </div>
+                    <div class="upi-address-wrapper">
+                        <span>Or Pay via VPA ID:</span>
+                        <code class="gold-text">courtix.pay@icici</code>
+                    </div>
+                    <button class="btn btn-gold btn-full-width" id="simulatedPayUPIBtn">
+                        <i class="fa-solid fa-circle-check"></i> Simulate Payment Success
+                    </button>
+                </div>
+            </div>
+
+            <!-- Method Content: Credit Card -->
+            <div class="payment-tab-content" id="method-card">
+                <form class="card-checkout-form" id="cardCheckoutForm">
+                    <div class="form-group">
+                        <label>Cardholder Name</label>
+                        <input type="text" placeholder="ROHIT SHARMA" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Card Number</label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-credit-card"></i>
+                            <input type="text" placeholder="4321 •••• •••• 9876" maxlength="19" required>
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Expiry Date</label>
+                            <input type="text" placeholder="MM/YY" maxlength="5" required>
+                        </div>
+                        <div class="form-group">
+                            <label>CVV/CVC</label>
+                            <input type="password" placeholder="•••" maxlength="3" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-gold btn-full-width">
+                        <i class="fa-solid fa-lock"></i> Authorize & Book Securely
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOOKING SUCCESS & DIGITAL BOARDING PASS MODAL (Simplified) -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-container glass-panel modal-medium">
+            <div class="success-banner text-center">
+                <div class="success-icon-circle"><i class="fa-solid fa-circle-check"></i></div>
+                <h2>Booking Confirmed!</h2>
+                <p>Your court session slot has been locked successfully.</p>
+            </div>
+
+            <!-- Luxury Digital Ticket Pass -->
+            <div class="digital-ticket glass-panel">
+                <div class="ticket-header">
+                    <div class="ticket-logo">COURT<span>IX</span></div>
+                    <div class="ticket-type-badge" id="ticketSportBadge">FOOTBALL</div>
+                </div>
+                
+                <div class="ticket-body">
+                    <div class="ticket-venue-row">
+                        <div class="ticket-label">VENUES</div>
+                        <div class="ticket-value" id="ticketVenueName">Udaipur Turf Club</div>
+                        <div class="ticket-subvalue" id="ticketVenueLocation">Shobhagpura, Udaipur</div>
+                    </div>
+
+                    <div class="ticket-meta-grid">
+                        <div>
+                            <div class="ticket-label">DATE</div>
+                            <div class="ticket-value" id="ticketDate">29th May 2026</div>
+                        </div>
+                        <div>
+                            <div class="ticket-label">TIME SLOT</div>
+                            <div class="ticket-value" id="ticketTime">06:00 PM - 07:00 PM</div>
+                        </div>
+                        <div>
+                            <div class="ticket-label">PASS ID</div>
+                            <div class="ticket-value gold-text" id="ticketPassId">CTX-981240</div>
+                        </div>
+                        <div>
+                            <div class="ticket-label">STATUS</div>
+                            <div class="ticket-value status-glow" id="ticketStatus">CONFIRMED</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ticket-divider">
+                    <div class="ticket-punch-hole left"></div>
+                    <div class="ticket-punch-hole right"></div>
+                    <div class="ticket-stitch-line"></div>
+                </div>
+
+                <div class="ticket-footer text-center">
+                    <div class="barcode-wrapper">
+                        <div class="simulated-barcode">
+                            <span class="bar bar-1"></span>
+                            <span class="bar bar-2"></span>
+                            <span class="bar bar-3"></span>
+                            <span class="bar bar-1"></span>
+                            <span class="bar bar-4"></span>
+                            <span class="bar bar-2"></span>
+                            <span class="bar bar-3"></span>
+                            <span class="bar bar-1"></span>
+                            <span class="bar bar-4"></span>
+                            <span class="bar bar-2"></span>
+                        </div>
+                        <code>CTX-BAR-981240</code>
+                    </div>
+                    <p class="ticket-notice">Present this digital pass at the venue entrance counter.</p>
+                </div>
+            </div>
+
+            <div class="success-actions">
+                <button class="btn btn-gold btn-full-width" id="successDashboardBtn">Go to My Bookings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUTHENTICATION & REGISTRATION MODAL (Sleek Sporty Glassmorphism) -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-container glass-panel modal-medium" style="max-width: 420px; padding: 2.2rem;">
+            <button class="modal-close" id="closeAuthModalBtn"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="auth-header text-center" style="margin-bottom: 1.5rem;">
+                <i class="fa-solid fa-user-ninja gold-glow-text" style="font-size: 2.8rem; margin-bottom: 0.8rem; display: inline-block;"></i>
+                <h2 id="authModalTitle" style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 700; color: #fff;">Welcome Player</h2>
+                <p id="authModalSubtitle" style="color: var(--color-text-muted); font-size: 0.95rem; margin-top: 4px;">Join the elite Courtix sports community</p>
+            </div>
+
+            <!-- Auth Switch Tabs -->
+            <div class="payment-tabs-headers" style="margin-bottom: 1.5rem; background: rgba(255,255,255,0.02); border-radius: 12px; padding: 4px;">
+                <button class="payment-tab active" id="authTabLogin" style="flex: 1; text-align: center; padding: 0.6rem; font-size: 0.95rem; font-weight: 600; border-radius: 8px;">Sign In</button>
+                <button class="payment-tab" id="authTabRegister" style="flex: 1; text-align: center; padding: 0.6rem; font-size: 0.95rem; font-weight: 600; border-radius: 8px;">Register</button>
+            </div>
+
+            <!-- Error/Success Feedback Message -->
+            <div id="authFeedbackMsg" style="display: none; padding: 0.8rem 1rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: 0.9rem; text-align: center; font-weight: 500; transition: var(--transition-smooth);"></div>
+
+            <!-- Sign In Form -->
+            <form id="loginForm" class="auth-form active">
+                <div class="form-group" style="margin-bottom: 1.2rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Email Address</label>
+                    <div class="input-icon-wrapper" style="position: relative;">
+                        <i class="fa-solid fa-envelope" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); font-size: 1rem;"></i>
+                        <input type="email" id="loginEmail" placeholder="player@courtix.com" required style="width: 100%; padding: 0.85rem 1rem 0.85rem 2.8rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; color: #fff; font-family: var(--font-body); font-size: 0.95rem; transition: var(--transition-smooth); outline: none;">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Password</label>
+                    <div class="input-icon-wrapper" style="position: relative;">
+                        <i class="fa-solid fa-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); font-size: 1rem;"></i>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required style="width: 100%; padding: 0.85rem 1rem 0.85rem 2.8rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; color: #fff; font-family: var(--font-body); font-size: 0.95rem; transition: var(--transition-smooth); outline: none;">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-gold btn-full-width btn-large" style="padding: 1rem; font-size: 1.05rem;">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Sign In to Play</span>
+                </button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="auth-form" style="display: none;">
+                <div class="form-group" style="margin-bottom: 1.2rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Full Name</label>
+                    <div class="input-icon-wrapper" style="position: relative;">
+                        <i class="fa-solid fa-user" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); font-size: 1rem;"></i>
+                        <input type="text" id="registerName" placeholder="Rohit Sharma" required style="width: 100%; padding: 0.85rem 1rem 0.85rem 2.8rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; color: #fff; font-family: var(--font-body); font-size: 0.95rem; transition: var(--transition-smooth); outline: none;">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 1.2rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Email Address</label>
+                    <div class="input-icon-wrapper" style="position: relative;">
+                        <i class="fa-solid fa-envelope" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); font-size: 1rem;"></i>
+                        <input type="email" id="registerEmail" placeholder="player@courtix.com" required style="width: 100%; padding: 0.85rem 1rem 0.85rem 2.8rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; color: #fff; font-family: var(--font-body); font-size: 0.95rem; transition: var(--transition-smooth); outline: none;">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Create Password</label>
+                    <div class="input-icon-wrapper" style="position: relative;">
+                        <i class="fa-solid fa-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); font-size: 1rem;"></i>
+                        <input type="password" id="registerPassword" placeholder="Minimum 6 characters" minlength="6" required style="width: 100%; padding: 0.85rem 1rem 0.85rem 2.8rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; color: #fff; font-family: var(--font-body); font-size: 0.95rem; transition: var(--transition-smooth); outline: none;">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-gold btn-full-width btn-large" style="padding: 1rem; font-size: 1.05rem;">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Create Player Profile</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- App Dynamic JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>

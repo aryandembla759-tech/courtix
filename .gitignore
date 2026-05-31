@@ -1,0 +1,21 @@
+# System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs and editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Local Environment / Temporary files
+.env
+.env.local
+.env.*.local
+node_modules/
+dist/
+.vercel/
