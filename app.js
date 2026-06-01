@@ -1743,11 +1743,24 @@ function startOtpCountdown() {
 }
 
 // Handler on OTP Verification Success
-function verifyOtpSuccess() {
-    const registeredUsers = getRegisteredUsers();
-    const phoneFull = otpActiveCountryCode + " " + otpActivePhone;
+async function verifyOtpSuccess() {
+    showAuthFeedback("Authenticating with cloud...", "info");
     
-    const existingUser = registeredUsers.find(u => u.phone === phoneFull);
+    try {
+        await syncCloudData();
+    } catch (syncErr) {
+        console.warn("OTP success cloud sync failed, using offline lookup", syncErr);
+    }
+
+    const registeredUsers = getRegisteredUsers();
+    const phoneDigits = otpActivePhone;
+    
+    // Match phone cleanly (last 10 digits comparison)
+    const existingUser = registeredUsers.find(u => {
+        if (!u.phone) return false;
+        const uPhoneDigits = u.phone.replace(/[^0-9]/g, '');
+        return uPhoneDigits.endsWith(phoneDigits);
+    });
     
     if (existingUser) {
         loginUser(existingUser);
@@ -1774,7 +1787,7 @@ function verifyOtpSuccess() {
 }
 
 // Complete Name Capture & Profile creation
-function handleOtpNameSubmit() {
+async function handleOtpNameSubmit() {
     const nameInput = document.getElementById("otpRegName");
     const emailInput = document.getElementById("otpRegEmail");
     if (!nameInput || !emailInput) return;
@@ -1794,6 +1807,13 @@ function handleOtpNameSubmit() {
         return;
     }
     
+    showAuthFeedback("Checking email availability...", "info");
+    try {
+        await syncCloudData();
+    } catch (syncErr) {
+        console.warn("OTP name check sync failed, using offline lookup", syncErr);
+    }
+
     const registeredUsers = getRegisteredUsers();
     
     // Check if email already exists
@@ -1815,7 +1835,14 @@ function handleOtpNameSubmit() {
     };
     
     registeredUsers.push(newUser);
-    saveRegisteredUsers(registeredUsers);
+    
+    showAuthFeedback("Creating profile secure check...", "info");
+    try {
+        await safePushUsersFromCustomer(registeredUsers);
+    } catch (pushErr) {
+        console.error("Failed pushing OTP registered user to cloud", pushErr);
+        localStorage.setItem("courtix_registered_users", JSON.stringify(registeredUsers));
+    }
     
     loginUser(newUser);
     showAuthFeedback("Profile registered successfully! Welcome to Courtix.", "success");
@@ -1904,8 +1931,10 @@ function getRegisteredUsers() {
 function saveRegisteredUsers(users) {
     try {
         localStorage.setItem("courtix_registered_users", JSON.stringify(users));
-        if (typeof triggerBackgroundPushUsers === "function") {
-            triggerBackgroundPushUsers(users);
+        if (typeof safePushUsersFromCustomer === "function") {
+            safePushUsersFromCustomer(users).catch(err => {
+                console.error("Failed background users push", err);
+            });
         }
     } catch (e) {
         console.error("Failed to save registered users", e);
@@ -1940,7 +1969,7 @@ function seedDefaultUsers() {
     }
 }
 
-function handleRegisterSubmit() {
+async function handleRegisterSubmit() {
     const nameInput = document.getElementById("registerName");
     const emailInput = document.getElementById("registerEmail");
     const passwordInput = document.getElementById("registerPassword");
@@ -1979,6 +2008,15 @@ function handleRegisterSubmit() {
         return;
     }
 
+    showAuthFeedback("Validating details with cloud...", "info");
+    
+    // Sync first to get the absolute latest registered users list
+    try {
+        await syncCloudData();
+    } catch (syncErr) {
+        console.warn("Pre-registration cloud sync failed, using offline backup", syncErr);
+    }
+
     const registeredUsers = getRegisteredUsers();
     
     // Check if user with email already exists
@@ -2010,7 +2048,16 @@ function handleRegisterSubmit() {
     };
 
     registeredUsers.push(newUser);
-    saveRegisteredUsers(registeredUsers);
+    
+    // Non-destructive push using our new safe Push function
+    showAuthFeedback("Saving account securely to cloud...", "info");
+    try {
+        await safePushUsersFromCustomer(registeredUsers);
+    } catch (pushErr) {
+        console.error("Failed pushing new user registration to cloud", pushErr);
+        // Fallback save to local storage
+        localStorage.setItem("courtix_registered_users", JSON.stringify(registeredUsers));
+    }
 
     // Auto-login the user
     loginUser(newUser);
@@ -2033,7 +2080,7 @@ function handleRegisterSubmit() {
     }, 1200);
 }
 
-function handleLoginSubmit() {
+async function handleLoginSubmit() {
     const emailInput = document.getElementById("loginEmail");
     const passwordInput = document.getElementById("loginPassword");
 
@@ -2047,13 +2094,13 @@ function handleLoginSubmit() {
         return;
     }
 
-    const registeredUsers = getRegisteredUsers();
+    let registeredUsers = getRegisteredUsers();
     
     // Normalize input for comparisons
     const inputLower = loginInputVal.toLowerCase();
     const inputDigits = loginInputVal.replace(/[^0-9]/g, '');
 
-    const matchedUser = registeredUsers.find(u => {
+    let matchedUser = registeredUsers.find(u => {
         // Match email
         const emailMatch = u.email && u.email.toLowerCase() === inputLower;
         
@@ -2070,6 +2117,31 @@ function handleLoginSubmit() {
         
         return (emailMatch || phoneMatch) && u.password === password;
     });
+
+    // If not found locally, we attempt an on-demand cloud synchronization
+    if (!matchedUser) {
+        showAuthFeedback("Checking cloud database...", "info");
+        try {
+            await syncCloudData();
+            registeredUsers = getRegisteredUsers();
+            
+            matchedUser = registeredUsers.find(u => {
+                const emailMatch = u.email && u.email.toLowerCase() === inputLower;
+                let phoneMatch = false;
+                if (u.phone) {
+                    const uPhoneDigits = u.phone.replace(/[^0-9]/g, '');
+                    if (inputDigits.length >= 10 && uPhoneDigits.endsWith(inputDigits)) {
+                        phoneMatch = true;
+                    } else if (u.phone.toLowerCase() === inputLower) {
+                        phoneMatch = true;
+                    }
+                }
+                return (emailMatch || phoneMatch) && u.password === password;
+            });
+        } catch (syncErr) {
+            console.warn("On-demand login sync failed", syncErr);
+        }
+    }
 
     if (!matchedUser) {
         showAuthFeedback("Invalid email/mobile or password. Please try again.");
@@ -2353,6 +2425,55 @@ function triggerBackgroundPushUsers(users) {
         },
         body: JSON.stringify(users)
     }).catch(err => console.warn("Failed background users push", err));
+}
+
+async function safePushUsersFromCustomer(updatedLocalList) {
+    try {
+        updateCloudIndicator("syncing");
+        
+        // 1. Fetch latest from cloud
+        let cloudUsers = [];
+        const res = await fetch(`${CLOUD_DB_API}/registered_users`, {
+            headers: { "x-token": CLOUD_DB_TOKEN }
+        });
+        if (res.ok) {
+            const text = await res.text();
+            cloudUsers = text ? JSON.parse(text) : [];
+        }
+        
+        // 2. Merge local changes into cloud copy safely (prevent overwriting others)
+        const merged = [...cloudUsers];
+        
+        updatedLocalList.forEach(lu => {
+            const match = merged.find(cu => cu.email === lu.email);
+            if (!match) {
+                // If it is a new user created locally, add it
+                merged.push(lu);
+            } else {
+                // If local user has updated details or password, update it in cloud
+                Object.assign(match, lu);
+            }
+        });
+        
+        // 3. Save locally and write to cloud
+        localStorage.setItem("courtix_registered_users", JSON.stringify(merged));
+        
+        await fetch(`${CLOUD_DB_API}/registered_users`, {
+            method: "POST",
+            headers: { 
+                "x-token": CLOUD_DB_TOKEN,
+                "Content-Type": "text/plain"
+            },
+            body: JSON.stringify(merged)
+        });
+        
+        updateCloudIndicator("synced");
+        return merged;
+    } catch(err) {
+        console.error("Customer safe push users failed", err);
+        updateCloudIndicator("failed");
+        throw err;
+    }
 }
 
 async function safePushBookingsFromCustomer(updatedLocalList) {
