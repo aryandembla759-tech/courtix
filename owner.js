@@ -54,6 +54,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Trigger background cloud database sync
     syncCloudData();
+
+    // Auto-sync from cloud database every 10 seconds to fetch new mobile/laptop bookings in real-time
+    setInterval(() => {
+        // Prevent background sync while owner is actively configuring block reasons in modal
+        const modal = document.getElementById("blockSlotModal");
+        const modalActive = modal ? modal.classList.contains("active") : false;
+        if (!modalActive) {
+            syncCloudData();
+        }
+    }, 10000);
 });
 
 // Populate dropdown facilities
@@ -132,8 +142,8 @@ function getCustomerBookings() {
 function saveCustomerBookings(bookings) {
     try {
         localStorage.setItem("courtix_direct_bookings", JSON.stringify(bookings));
-        if (typeof triggerBackgroundPushBookings === "function") {
-            triggerBackgroundPushBookings(bookings);
+        if (typeof safePushBookingsFromOwner === "function") {
+            safePushBookingsFromOwner(bookings);
         }
     } catch (e) {
         console.error("Failed to save customer bookings", e);
@@ -765,13 +775,61 @@ function updateCloudIndicator(status) {
     }
 }
 
-function triggerBackgroundPushBookings(bookings) {
-    fetch(`${CLOUD_DB_API}/direct_bookings`, {
-        method: "POST",
-        headers: { 
-            "x-token": CLOUD_DB_TOKEN,
-            "Content-Type": "text/plain"
-        },
-        body: JSON.stringify(bookings)
-    }).catch(err => console.warn("Failed background bookings push", err));
+async function safePushBookingsFromOwner(updatedLocalList) {
+    try {
+        updateCloudIndicator("syncing");
+        
+        // 1. Fetch latest from cloud
+        let cloudBookings = [];
+        const res = await fetch(`${CLOUD_DB_API}/direct_bookings`, {
+            headers: { "x-token": CLOUD_DB_TOKEN }
+        });
+        if (res.ok) {
+            const text = await res.text();
+            cloudBookings = text ? JSON.parse(text) : [];
+        }
+        
+        // 2. Merge local changes into cloud copy safely (prevent overwriting others)
+        let merged = [...cloudBookings];
+        
+        // Apply owner's local operations:
+        // A. If a booking is deleted (revoked) locally, delete it from the cloud copy
+        const localIds = updatedLocalList.map(b => b.id);
+        merged = merged.filter(b => {
+            return localIds.includes(b.id);
+        });
+        
+        // B. If a booking's status was changed locally (completed), sync it
+        updatedLocalList.forEach(lb => {
+            const match = merged.find(cb => cb.id === lb.id);
+            if (match) {
+                match.status = lb.status;
+            } else {
+                merged.push(lb);
+            }
+        });
+
+        // Ensure every booking has a status field
+        merged.forEach(b => {
+            if (!b.status) b.status = "upcoming";
+        });
+        
+        // 3. Save locally and write to cloud
+        localStorage.setItem("courtix_direct_bookings", JSON.stringify(merged));
+        
+        await fetch(`${CLOUD_DB_API}/direct_bookings`, {
+            method: "POST",
+            headers: { 
+                "x-token": CLOUD_DB_TOKEN,
+                "Content-Type": "text/plain"
+            },
+            body: JSON.stringify(merged)
+        });
+        
+        refreshDashboard();
+        updateCloudIndicator("synced");
+    } catch(err) {
+        console.error("Owner safe push failed", err);
+        updateCloudIndicator("failed");
+    }
 }

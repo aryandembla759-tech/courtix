@@ -415,8 +415,8 @@ function loadStateFromStorage() {
 function saveStateToStorage() {
     try {
         localStorage.setItem("courtix_direct_bookings", JSON.stringify(appState.myBookings));
-        if (typeof triggerBackgroundPushBookings === "function") {
-            triggerBackgroundPushBookings(appState.myBookings);
+        if (typeof safePushBookingsFromCustomer === "function") {
+            safePushBookingsFromCustomer(appState.myBookings);
         }
     } catch (e) {
         console.error("LocalStorage save failed", e);
@@ -709,9 +709,17 @@ function renderMyBookings() {
     upcomingList.innerHTML = "";
     pastList.innerHTML = "";
 
-    // Separate bookings by status
-    const upcomingBookings = appState.myBookings.filter(b => b.status !== "completed");
-    const completedBookings = appState.myBookings.filter(b => b.status === "completed");
+    // Separate bookings by status and filter by current user's email/phone to ensure privacy
+    const upcomingBookings = appState.myBookings.filter(b => {
+        const isMatchStatus = b.status !== "completed";
+        const isMatchUser = appState.currentUser ? (b.email === appState.currentUser.email || b.phone === appState.currentUser.phone) : false;
+        return isMatchStatus && isMatchUser;
+    });
+    const completedBookings = appState.myBookings.filter(b => {
+        const isMatchStatus = b.status === "completed";
+        const isMatchUser = appState.currentUser ? (b.email === appState.currentUser.email || b.phone === appState.currentUser.phone) : false;
+        return isMatchStatus && isMatchUser;
+    });
 
     // Stats calculations
     document.getElementById("statBookedCount").innerText = upcomingBookings.length;
@@ -2347,13 +2355,60 @@ function triggerBackgroundPushUsers(users) {
     }).catch(err => console.warn("Failed background users push", err));
 }
 
-function triggerBackgroundPushBookings(bookings) {
-    fetch(`${CLOUD_DB_API}/direct_bookings`, {
-        method: "POST",
-        headers: { 
-            "x-token": CLOUD_DB_TOKEN,
-            "Content-Type": "text/plain"
-        },
-        body: JSON.stringify(bookings)
-    }).catch(err => console.warn("Failed background bookings push", err));
+async function safePushBookingsFromCustomer(updatedLocalList) {
+    try {
+        updateCloudIndicator("syncing");
+        
+        // 1. Fetch latest from cloud
+        let cloudBookings = [];
+        const res = await fetch(`${CLOUD_DB_API}/direct_bookings`, {
+            headers: { "x-token": CLOUD_DB_TOKEN }
+        });
+        if (res.ok) {
+            const text = await res.text();
+            cloudBookings = text ? JSON.parse(text) : [];
+        }
+        
+        // 2. Merge local changes into cloud copy safely (prevent overwriting others)
+        const merged = [...cloudBookings];
+        
+        updatedLocalList.forEach(lb => {
+            const match = merged.find(cb => cb.id === lb.id);
+            if (!match) {
+                // If it is a new booking created locally, add it
+                merged.unshift(lb);
+            } else {
+                // If status or details changed, sync them
+                match.status = lb.status;
+            }
+        });
+
+        // Ensure every booking has a status field
+        merged.forEach(b => {
+            if (!b.status) b.status = "upcoming";
+        });
+        
+        // 3. Save locally and write to cloud
+        appState.myBookings = merged;
+        localStorage.setItem("courtix_direct_bookings", JSON.stringify(merged));
+        
+        await fetch(`${CLOUD_DB_API}/direct_bookings`, {
+            method: "POST",
+            headers: { 
+                "x-token": CLOUD_DB_TOKEN,
+                "Content-Type": "text/plain"
+            },
+            body: JSON.stringify(merged)
+        });
+        
+        renderMyBookings();
+        if (typeof generateSlotGrids === "function") {
+            generateSlotGrids();
+        }
+        
+        updateCloudIndicator("synced");
+    } catch(err) {
+        console.error("Customer safe push failed", err);
+        updateCloudIndicator("failed");
+    }
 }
