@@ -387,6 +387,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Sync current logged in user details
     updateUserUIState();
+
+    // Trigger background cloud database sync
+    syncCloudData();
 });
 
 // 4. STORAGE SYNCING
@@ -412,6 +415,9 @@ function loadStateFromStorage() {
 function saveStateToStorage() {
     try {
         localStorage.setItem("courtix_direct_bookings", JSON.stringify(appState.myBookings));
+        if (typeof triggerBackgroundPushBookings === "function") {
+            triggerBackgroundPushBookings(appState.myBookings);
+        }
     } catch (e) {
         console.error("LocalStorage save failed", e);
     }
@@ -1864,6 +1870,9 @@ function getRegisteredUsers() {
 function saveRegisteredUsers(users) {
     try {
         localStorage.setItem("courtix_registered_users", JSON.stringify(users));
+        if (typeof triggerBackgroundPushUsers === "function") {
+            triggerBackgroundPushUsers(users);
+        }
     } catch (e) {
         console.error("Failed to save registered users", e);
     }
@@ -2159,4 +2168,166 @@ function showCouponFeedback(msg, type = "error") {
         feedback.style.color = "#ff4b4b";
         feedback.style.boxShadow = "0 0 10px rgba(255, 75, 75, 0.15)";
     }
+}
+
+// ==========================================
+// ☁️ CLOUD DATABASE SYNC ENGINE
+// ==========================================
+const CLOUD_DB_TOKEN = "t9CmYFt3wFNR7fNSnhDp";
+const CLOUD_DB_API = "https://api.echovalue.dev/kv/default";
+
+async function syncCloudData() {
+    try {
+        updateCloudIndicator("syncing");
+
+        // 1. Sync Registered Users
+        const localUsers = getRegisteredUsers();
+        let cloudUsers = [];
+        try {
+            const res = await fetch(`${CLOUD_DB_API}/registered_users`, {
+                headers: { "x-token": CLOUD_DB_TOKEN }
+            });
+            if (res.ok) {
+                const text = await res.text();
+                cloudUsers = text ? JSON.parse(text) : [];
+            }
+        } catch(err) {
+            console.warn("Could not fetch cloud users", err);
+        }
+
+        // Merge users by email
+        const mergedUsers = [...localUsers];
+        cloudUsers.forEach(cu => {
+            const match = mergedUsers.find(lu => lu.email === cu.email);
+            if (!match) {
+                mergedUsers.push(cu);
+            }
+        });
+
+        // Save locally
+        localStorage.setItem("courtix_registered_users", JSON.stringify(mergedUsers));
+
+        // Push merged copy to cloud if changes exist
+        if (JSON.stringify(mergedUsers) !== JSON.stringify(cloudUsers)) {
+            await fetch(`${CLOUD_DB_API}/registered_users`, {
+                method: "POST",
+                headers: { 
+                    "x-token": CLOUD_DB_TOKEN,
+                    "Content-Type": "text/plain"
+                },
+                body: JSON.stringify(mergedUsers)
+            });
+        }
+
+        // 2. Sync Bookings
+        const localBookings = appState.myBookings;
+        let cloudBookings = [];
+        try {
+            const res = await fetch(`${CLOUD_DB_API}/direct_bookings`, {
+                headers: { "x-token": CLOUD_DB_TOKEN }
+            });
+            if (res.ok) {
+                const text = await res.text();
+                cloudBookings = text ? JSON.parse(text) : [];
+            }
+        } catch(err) {
+            console.warn("Could not fetch cloud bookings", err);
+        }
+
+        // Merge bookings by ID
+        const mergedBookings = [...localBookings];
+        cloudBookings.forEach(cb => {
+            const match = mergedBookings.find(lb => lb.id === cb.id);
+            if (!match) {
+                mergedBookings.push(cb);
+            } else {
+                if (cb.status === "completed" && match.status !== "completed") {
+                    match.status = "completed";
+                }
+            }
+        });
+
+        // Ensure every booking has a status field
+        mergedBookings.forEach(b => {
+            if (!b.status) b.status = "upcoming";
+        });
+
+        // Save locally
+        appState.myBookings = mergedBookings;
+        localStorage.setItem("courtix_direct_bookings", JSON.stringify(mergedBookings));
+
+        // Push merged copy to cloud if changes exist
+        if (JSON.stringify(mergedBookings) !== JSON.stringify(cloudBookings)) {
+            await fetch(`${CLOUD_DB_API}/direct_bookings`, {
+                method: "POST",
+                headers: { 
+                    "x-token": CLOUD_DB_TOKEN,
+                    "Content-Type": "text/plain"
+                },
+                body: JSON.stringify(mergedBookings)
+            });
+        }
+
+        // Re-render UI elements
+        renderMyBookings();
+        if (typeof generateSlotGrids === "function") {
+            generateSlotGrids();
+        }
+
+        updateCloudIndicator("synced");
+    } catch(e) {
+        console.error("Cloud sync failed", e);
+        updateCloudIndicator("failed");
+    }
+}
+
+function updateCloudIndicator(status) {
+    const el = document.getElementById("cloudSyncStatus");
+    const icon = document.getElementById("cloudSyncIcon");
+    const text = document.getElementById("cloudSyncText");
+
+    if (!el || !icon || !text) return;
+
+    if (status === "syncing") {
+        el.style.background = "rgba(255, 255, 255, 0.08)";
+        el.style.borderColor = "rgba(255, 255, 255, 0.2)";
+        el.style.color = "#fff";
+        icon.className = "fa-solid fa-rotate fa-spin";
+        text.innerText = "Syncing...";
+    } else if (status === "synced") {
+        const isOwner = window.location.pathname.includes("owner.html");
+        el.style.background = isOwner ? "rgba(255, 159, 67, 0.08)" : "rgba(0, 240, 255, 0.08)";
+        el.style.borderColor = isOwner ? "rgba(255, 159, 67, 0.2)" : "rgba(0, 240, 255, 0.2)";
+        el.style.color = isOwner ? "var(--color-owner-orange)" : "#00F0FF";
+        icon.className = "fa-solid fa-cloud-arrow-up";
+        text.innerText = "Cloud Synced";
+    } else if (status === "failed") {
+        el.style.background = "rgba(255, 75, 75, 0.08)";
+        el.style.borderColor = "rgba(255, 75, 75, 0.2)";
+        el.style.color = "#ff4b4b";
+        icon.className = "fa-solid fa-cloud-circle-exclamation";
+        text.innerText = "Sync Failed";
+    }
+}
+
+function triggerBackgroundPushUsers(users) {
+    fetch(`${CLOUD_DB_API}/registered_users`, {
+        method: "POST",
+        headers: { 
+            "x-token": CLOUD_DB_TOKEN,
+            "Content-Type": "text/plain"
+        },
+        body: JSON.stringify(users)
+    }).catch(err => console.warn("Failed background users push", err));
+}
+
+function triggerBackgroundPushBookings(bookings) {
+    fetch(`${CLOUD_DB_API}/direct_bookings`, {
+        method: "POST",
+        headers: { 
+            "x-token": CLOUD_DB_TOKEN,
+            "Content-Type": "text/plain"
+        },
+        body: JSON.stringify(bookings)
+    }).catch(err => console.warn("Failed background bookings push", err));
 }

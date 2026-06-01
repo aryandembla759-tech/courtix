@@ -659,7 +659,14 @@
                 <img src="courtix_logo.png" alt="Courtix Logo" class="owner-logo-icon">
                 <div class="owner-title">COURT<span>IX</span></div>
             </div>
-            <div class="owner-badge">🔑 Court Owner Panel</div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <!-- Cloud Sync Status Badge -->
+                <div id="cloudSyncStatus" style="display: flex; align-items: center; gap: 0.4rem; background: rgba(255, 159, 67, 0.08); border: 1px solid rgba(255, 159, 67, 0.2); padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; color: var(--color-owner-orange); cursor: pointer; transition: all 0.3s ease; font-family: var(--font-body);" onclick="syncCloudData()" title="Sync local data with cloud database">
+                    <i class="fa-solid fa-cloud-arrow-up" id="cloudSyncIcon"></i>
+                    <span id="cloudSyncText">Cloud Synced</span>
+                </div>
+                <div class="owner-badge">🔑 Court Owner Panel</div>
+            </div>
         </header>
 
         <!-- Controls Toolbar -->

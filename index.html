@@ -74,7 +74,12 @@
                         </select>
                     </div>
                 </div>
-                <div class="header-right">
+                <div class="header-right" style="display: flex; align-items: center; gap: 1rem;">
+                    <!-- Cloud Sync Status Badge -->
+                    <div id="cloudSyncStatus" style="display: flex; align-items: center; gap: 0.4rem; background: rgba(0, 240, 255, 0.08); border: 1px solid rgba(0, 240, 255, 0.2); padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; color: #00F0FF; cursor: pointer; transition: all 0.3s ease; font-family: var(--font-body);" onclick="syncCloudData()" title="Sync local data with cloud database">
+                        <i class="fa-solid fa-cloud-arrow-up" id="cloudSyncIcon"></i>
+                        <span id="cloudSyncText">Cloud Synced</span>
+                    </div>
                     <div class="notification-bell">
                         <i class="fa-solid fa-bell"></i>
                         <span class="notification-indicator"></span>
