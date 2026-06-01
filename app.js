@@ -1251,6 +1251,11 @@ function completePaymentSuccess() {
     const transactionId = "CTX-" + Math.floor(100000 + Math.random() * 900000);
 
     // 1. Save Reservation locally
+    const currentUser = appState.currentUser || {};
+    const customerName = currentUser.name || "Guest Player";
+    const customerEmail = currentUser.email || "guest@courtix.com";
+    const customerPhone = currentUser.phone || "No phone registered";
+
     const newBooking = {
         id: transactionId,
         venueId: venue.id,
@@ -1265,7 +1270,10 @@ function completePaymentSuccess() {
         advancePaid: advancePaid,
         remainingBalance: remainingBalance,
         appliedCoupon: appState.appliedCoupon || null,
-        discountAmount: appState.discountAmount || 0
+        discountAmount: appState.discountAmount || 0,
+        name: customerName,
+        email: customerEmail,
+        phone: customerPhone
     };
 
     appState.myBookings.unshift(newBooking);
