@@ -329,6 +329,45 @@ function renderBookingsLog(venue) {
         return;
     }
 
+    // Calculate total remaining collection amount
+    let totalRemainingToReceive = 0;
+    dayBookings.forEach(b => {
+        const remaining = b.remainingBalance !== undefined ? b.remainingBalance : (b.totalCost - Math.round(b.totalCost * 0.1));
+        totalRemainingToReceive += remaining;
+    });
+
+    // Create a beautiful, prominent summary header card
+    const summaryCard = document.createElement("div");
+    summaryCard.className = "booking-summary-card";
+    summaryCard.style.cssText = `
+        background: linear-gradient(135deg, rgba(255, 159, 67, 0.12) 0%, rgba(255, 159, 67, 0.03) 100%);
+        border: 1px solid rgba(255, 159, 67, 0.2);
+        border-radius: 14px;
+        padding: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.2rem;
+        box-shadow: 0 8px 32px rgba(255, 159, 67, 0.08);
+        backdrop-filter: blur(12px);
+    `;
+    summaryCard.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <div style="height: 42px; width: 42px; border-radius: 10px; background: rgba(255, 159, 67, 0.15); border: 1px solid rgba(255, 159, 67, 0.25); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--color-owner-orange);">
+                <i class="fa-solid fa-hand-holding-dollar"></i>
+            </div>
+            <div>
+                <div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.9); font-weight: 600;">Total Remaining to Collect</div>
+                <div style="font-size: 0.7rem; color: var(--color-text-muted); margin-top: 2px;">From all customers on this day</div>
+            </div>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-size: 1.4rem; font-weight: 800; color: var(--color-owner-orange); font-family: var(--font-heading); text-shadow: 0 0 10px rgba(255, 159, 67, 0.2);">₹${totalRemainingToReceive}</div>
+        </div>
+    `;
+    container.appendChild(summaryCard);
+
     // Load active session user as fallback for older bookings
     let fallbackName = "Online Player";
     let fallbackEmail = "player@courtix.com";
@@ -374,13 +413,18 @@ function renderBookingsLog(venue) {
                     <strong style="color: #fff;">Hours: ${slotsDisplay}</strong>
                 </div>
             </div>
-            <div class="booking-card-footer">
-                <div class="booking-cost-block">
-                    <span class="booking-cost-title">Total Reservation Paid</span>
-                    <span class="booking-cost-val">₹${b.totalCost}</span>
+            <div class="booking-card-footer" style="display: flex; flex-direction: column; gap: 0.6rem; align-items: stretch; margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid rgba(255, 255, 255, 0.05); font-family: var(--font-body);">
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--color-text-muted);">
+                    <span>Total Reservation Value:</span>
+                    <strong style="color: #fff; font-size: 0.9rem;">₹${b.totalCost}</strong>
                 </div>
-                <div style="font-size: 0.75rem; color: var(--color-owner-green); font-weight: 700; background: rgba(29, 209, 161, 0.08); padding: 0.25rem 0.6rem; border-radius: 6px; border: 1px solid rgba(29, 209, 161, 0.2);">
-                    ⚡ Split Advance Paid
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--color-owner-green);">
+                    <span><i class="fa-solid fa-circle-check"></i> 10% Advance Paid Online:</span>
+                    <strong>₹${b.advancePaid || Math.round(b.totalCost * 0.1)}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; background: rgba(255, 159, 67, 0.08); padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid rgba(255, 159, 67, 0.15); margin-top: 4px;">
+                    <span style="color: var(--color-owner-orange); font-weight: 600;"><i class="fa-solid fa-hand-holding-dollar"></i> Collect Remaining at Venue:</span>
+                    <strong style="color: var(--color-owner-orange); font-size: 1.05rem; font-weight: 800;">₹${b.remainingBalance || (b.totalCost - Math.round(b.totalCost * 0.1))}</strong>
                 </div>
             </div>
         `;
