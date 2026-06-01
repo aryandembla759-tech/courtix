@@ -449,6 +449,28 @@ function bindNavigationEvents() {
     if (viewAllBtn) {
         viewAllBtn.addEventListener("click", () => switchTab("explore"));
     }
+
+    // My Bookings Subtabs listener
+    const bookingSubtabs = document.querySelectorAll(".booking-tab");
+    bookingSubtabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            // Remove active class from all tabs
+            bookingSubtabs.forEach(t => t.classList.remove("active"));
+            // Add active class to clicked tab
+            tab.classList.add("active");
+
+            // Hide all subtab contents
+            const contents = document.querySelectorAll(".bookings-tab-content");
+            contents.forEach(content => content.classList.remove("active"));
+
+            // Show active subtab content
+            const subtabId = tab.getAttribute("data-subtab");
+            const targetContent = document.getElementById(`subtab-${subtabId}`);
+            if (targetContent) {
+                targetContent.classList.add("active");
+            }
+        });
+    });
 }
 
 function switchTab(tabName) {
