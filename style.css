@@ -2387,8 +2387,8 @@ input:checked + .slider:before {
 
 @media (max-width: 768px) {
     .main-content {
-        padding: 1.5rem 1.5rem 90px;
-        gap: 2.2rem;
+        padding: 1.25rem 1.25rem 90px;
+        gap: 2rem;
     }
     
     .mobile-nav {
@@ -2396,15 +2396,15 @@ input:checked + .slider:before {
     }
     
     .hero-section {
-        padding: 2.2rem 1.8rem;
+        padding: 2rem 1.5rem;
     }
     .hero-title {
-        font-size: 2.2rem;
+        font-size: 2.1rem;
     }
     .glass-search-bar {
         flex-direction: column;
         gap: 0.8rem;
-        padding: 1rem;
+        padding: 0.8rem;
     }
     .search-field-divider {
         display: none;
@@ -2420,7 +2420,7 @@ input:checked + .slider:before {
         grid-template-columns: 1fr;
     }
     .feature-glow-card {
-        padding: 2.2rem 1.8rem;
+        padding: 2rem 1.5rem;
     }
     
     .dashboard-stats-grid {
@@ -2443,11 +2443,25 @@ input:checked + .slider:before {
     }
     
     .modal-container {
-        padding: 1.8rem;
+        padding: 1.4rem !important;
+        max-height: 94vh !important;
+        border-radius: 18px !important;
+    }
+    .modal-court-info h2 {
+        font-size: 1.35rem !important;
+    }
+    .modal-court-info .court-meta-row {
+        flex-wrap: wrap;
+        gap: 0.6rem;
     }
     
     .slots-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem !important;
+    }
+    .slot-btn {
+        padding: 0.7rem !important;
+        font-size: 0.85rem !important;
     }
     
     .booking-action-bar {
@@ -2459,6 +2473,76 @@ input:checked + .slider:before {
     
     .payment-tabs-headers {
         grid-template-columns: 1fr;
+    }
+
+    /* Swipeable horizontal sports selector pills */
+    .filter-options {
+        display: flex !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        gap: 0.5rem !important;
+        padding-bottom: 0.6rem !important;
+        scrollbar-width: none !important;
+        -webkit-overflow-scrolling: touch;
+        margin-top: 0.5rem;
+        grid-template-columns: none !important;
+    }
+    .filter-options::-webkit-scrollbar {
+        display: none !important;
+    }
+    .filter-pill {
+        flex-shrink: 0 !important;
+        padding: 0.55rem 1.05rem !important;
+        font-size: 0.8rem !important;
+    }
+
+    /* Swipeable featured venues or clean vertical spacing */
+    .featured-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.2rem !important;
+    }
+    .venue-card {
+        border-radius: 16px !important;
+    }
+    
+    /* Header layout adjustments for narrow screens */
+    #locationSelector {
+        font-size: 0.85rem !important;
+        max-width: 130px;
+    }
+    .location-badge i {
+        font-size: 0.85rem !important;
+    }
+
+    /* Hide cloud sync status text under 480px width to fit narrow mobile models */
+    @media (max-width: 480px) {
+        #cloudSyncText {
+            display: none !important;
+        }
+        #cloudSyncStatus {
+            padding: 0.35rem 0.55rem !important;
+            border-radius: 50% !important;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.2rem;
+        }
+        #cloudSyncIcon {
+            margin: 0 !important;
+            font-size: 0.95rem;
+        }
+    }
+
+    /* OTP Code digit boxes thumbs ease */
+    .otp-inputs-wrapper {
+        gap: 0.4rem !important;
+    }
+    .otp-input-box {
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 1.3rem !important;
     }
 }
 
