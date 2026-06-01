@@ -1362,6 +1362,9 @@ function updateUserUIState() {
     const logoutBtn = document.getElementById("sidebarLogoutBtn");
     const avatarPic = document.getElementById("userProfilePic");
 
+    const mobileText = document.getElementById("mobileUserText");
+    const mobileIcon = document.getElementById("mobileUserIcon");
+
     if (appState.currentUser) {
         if (nameEl) nameEl.innerText = appState.currentUser.name;
         
@@ -1379,6 +1382,10 @@ function updateUserUIState() {
             avatarPic.style.border = "2px solid var(--color-gold)";
             avatarPic.style.boxShadow = "0 0 10px rgba(197, 255, 26, 0.4)";
         }
+
+        // Update mobile bottom nav
+        if (mobileText) mobileText.innerText = "Sign Out";
+        if (mobileIcon) mobileIcon.className = "fa-solid fa-right-from-bracket gold-text";
     } else {
         if (nameEl) nameEl.innerText = "Guest Player";
         if (levelEl) levelEl.innerText = "Click to Sign In";
@@ -1387,6 +1394,10 @@ function updateUserUIState() {
             avatarPic.style.border = "none";
             avatarPic.style.boxShadow = "none";
         }
+
+        // Update mobile bottom nav
+        if (mobileText) mobileText.innerText = "Sign In";
+        if (mobileIcon) mobileIcon.className = "fa-solid fa-user";
     }
 }
 
@@ -1419,12 +1430,27 @@ function bindAuthEvents() {
     const resendOtpBtn = document.getElementById("resendOtpBtn");
     
     const logoutBtn = document.getElementById("sidebarLogoutBtn");
+    const mobileUserTab = document.getElementById("mobileUserTab");
 
     // Click sidebar user profile: open auth modal if logged out
     if (sidebarUserBlock) {
         sidebarUserBlock.addEventListener("click", () => {
             if (!appState.currentUser) {
                 openAuthModal();
+            }
+        });
+    }
+
+    // Click mobile user navigation tab
+    if (mobileUserTab) {
+        mobileUserTab.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (!appState.currentUser) {
+                openAuthModal();
+            } else {
+                if (confirm(`Logged in as ${appState.currentUser.name}.\n\nDo you want to sign out of your account?`)) {
+                    logoutUser();
+                }
             }
         });
     }
