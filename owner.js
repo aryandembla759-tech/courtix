@@ -176,6 +176,16 @@ function renderTimelineGrid(venue) {
     const startHour = venue.openHours.start;
     const endHour = venue.openHours.end;
 
+    // Load active session user as fallback for older bookings
+    let fallbackName = "Online Player";
+    try {
+        const curUserStr = localStorage.getItem("courtix_current_user");
+        if (curUserStr) {
+            const curUser = JSON.parse(curUserStr);
+            if (curUser.name) fallbackName = curUser.name;
+        }
+    } catch(e) {}
+
     // Retrieve active reservation datasets
     const allCustomerBookings = getCustomerBookings();
     const allOwnerBlocks = getOwnerBlocks();
@@ -235,9 +245,7 @@ function renderTimelineGrid(venue) {
             statusPill.innerHTML = `<i class="fa-solid fa-user-tag"></i> Booked`;
             
             // Try to extract client name from booking ID details
-            let clientName = "Customer";
-            if (customerMatch.name) clientName = customerMatch.name;
-            else if (customerMatch.appliedCoupon) clientName = "Online User";
+            let clientName = customerMatch.name || fallbackName;
             
             metaInfo.innerText = `Client: ${clientName} (${customerMatch.id})`;
 
@@ -321,6 +329,20 @@ function renderBookingsLog(venue) {
         return;
     }
 
+    // Load active session user as fallback for older bookings
+    let fallbackName = "Online Player";
+    let fallbackEmail = "player@courtix.com";
+    let fallbackPhone = "No phone registered";
+    try {
+        const curUserStr = localStorage.getItem("courtix_current_user");
+        if (curUserStr) {
+            const curUser = JSON.parse(curUserStr);
+            if (curUser.name) fallbackName = curUser.name;
+            if (curUser.email) fallbackEmail = curUser.email;
+            if (curUser.phone) fallbackPhone = curUser.phone;
+        }
+    } catch(e) {}
+
     dayBookings.forEach(b => {
         const card = document.createElement("div");
         card.className = "booking-card";
@@ -337,15 +359,15 @@ function renderBookingsLog(venue) {
             <div class="booking-card-body">
                 <div class="booking-body-row">
                     <i class="fa-solid fa-user"></i>
-                    <span class="booking-customer-name">${b.name || "Online Player"}</span>
+                    <span class="booking-customer-name">${b.name || fallbackName}</span>
                 </div>
                 <div class="booking-body-row">
                     <i class="fa-solid fa-envelope"></i>
-                    <span>${b.email || "player@courtix.com"}</span>
+                    <span>${b.email || fallbackEmail}</span>
                 </div>
                 <div class="booking-body-row">
                     <i class="fa-solid fa-phone"></i>
-                    <span>${b.phone || "No phone registered"}</span>
+                    <span>${b.phone || fallbackPhone}</span>
                 </div>
                 <div class="booking-body-row">
                     <i class="fa-solid fa-clock"></i>
