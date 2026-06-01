@@ -395,6 +395,11 @@ function loadStateFromStorage() {
         const bookings = localStorage.getItem("courtix_direct_bookings");
         appState.myBookings = bookings ? JSON.parse(bookings) : [];
         
+        // Ensure every booking has a status field
+        appState.myBookings.forEach(b => {
+            if (!b.status) b.status = "upcoming";
+        });
+        
         const currentUserStr = localStorage.getItem("courtix_current_user");
         appState.currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
     } catch (e) {
@@ -676,13 +681,16 @@ function renderMyBookings() {
     upcomingList.innerHTML = "";
     pastList.innerHTML = "";
 
-    // Stats calculations
-    document.getElementById("statBookedCount").innerText = appState.myBookings.length;
-    // Set some completed bookings simulation to look organic
-    document.getElementById("statPastCount").innerText = appState.myBookings.length > 0 ? "1" : "0";
+    // Separate bookings by status
+    const upcomingBookings = appState.myBookings.filter(b => b.status !== "completed");
+    const completedBookings = appState.myBookings.filter(b => b.status === "completed");
 
-    // 1. Render Booked Matches
-    if (appState.myBookings.length === 0) {
+    // Stats calculations
+    document.getElementById("statBookedCount").innerText = upcomingBookings.length;
+    document.getElementById("statPastCount").innerText = completedBookings.length;
+
+    // 1. Render Booked Matches (Active / Upcoming)
+    if (upcomingBookings.length === 0) {
         upcomingList.innerHTML = `
             <div class="empty-state">
                 <i class="fa-solid fa-calendar-xmark"></i>
@@ -691,7 +699,7 @@ function renderMyBookings() {
             </div>
         `;
     } else {
-        appState.myBookings.forEach(b => {
+        upcomingBookings.forEach(b => {
             const item = document.createElement("div");
             item.className = "booking-item-card";
 
@@ -732,40 +740,49 @@ function renderMyBookings() {
         });
     }
 
-    // 2. Render Completed Matches (Simulate 1 previous match if bookings exist to look authentic)
-    if (appState.myBookings.length === 0) {
+    // 2. Render Completed Matches
+    if (completedBookings.length === 0) {
         pastList.innerHTML = `
             <div class="empty-state">
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 <h3>No history of past slots played</h3>
+                <p>Once the facility owner marks your payment as received at the venue, your completed matches will appear here.</p>
             </div>
         `;
     } else {
-        const item = document.createElement("div");
-        item.className = "booking-item-card";
-        item.style.opacity = "0.7";
+        completedBookings.forEach(b => {
+            const item = document.createElement("div");
+            item.className = "booking-item-card";
+            item.style.opacity = "0.9";
 
-        item.innerHTML = `
-            <div class="booking-item-icon flex-center" style="color:var(--color-text-muted); border-color:var(--border-color);"><i class="fa-solid fa-check-double"></i></div>
-            <div class="booking-item-details">
-                <div class="booking-det-block">
-                    <span>Sports Complex Venue</span>
-                    <strong>Udaipur Turf Club</strong>
+            const slotsDisplay = b.slots.map(s => `${String(s).padStart(2, '0')}:00`).join(", ");
+
+            item.innerHTML = `
+                <div class="booking-item-icon flex-center" style="color:var(--color-owner-green); border-color:rgba(29, 209, 161, 0.2);"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="booking-item-details" style="grid-template-columns: repeat(4, 1fr);">
+                    <div class="booking-det-block">
+                        <span>Sports Complex Venue</span>
+                        <strong>${b.venueName}</strong>
+                    </div>
+                    <div class="booking-det-block">
+                        <span>Played Date & Timings</span>
+                        <strong>${b.date} | ${slotsDisplay}</strong>
+                    </div>
+                    <div class="booking-det-block">
+                        <span>Total Invoice Value</span>
+                        <strong class="gold-text">₹${b.totalCost}</strong>
+                    </div>
+                    <div class="booking-det-block">
+                        <span>Payment Status</span>
+                        <strong style="color: #1dd1a1;"><i class="fa-solid fa-check-double"></i> Fully Paid (Received)</strong>
+                    </div>
                 </div>
-                <div class="booking-det-block">
-                    <span>Played Date & Timings</span>
-                    <strong>20th May 2026 | 06:00 PM - 07:00 PM</strong>
+                <div class="booking-ticket-action">
+                    <span class="badge btn-outline" style="border-color:rgba(29, 209, 161, 0.3); color:#1dd1a1; font-size: 0.75rem; padding: 0.3rem 0.6rem; border-radius: 6px; font-weight: 700; background: rgba(29, 209, 161, 0.05);">Completed</span>
                 </div>
-                <div class="booking-det-block">
-                    <span>Completed Invoice</span>
-                    <strong>₹1,000</strong>
-                </div>
-            </div>
-            <div class="booking-ticket-action">
-                <span class="badge btn-outline" style="border-color:rgba(255,255,255,0.05); color:var(--color-text-muted);">Played</span>
-            </div>
-        `;
-        pastList.appendChild(item);
+            `;
+            pastList.appendChild(item);
+        });
     }
 }
 

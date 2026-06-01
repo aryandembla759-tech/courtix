@@ -115,7 +115,11 @@ function bindModalListeners() {
 function getCustomerBookings() {
     try {
         const bookingsStr = localStorage.getItem("courtix_direct_bookings");
-        return bookingsStr ? JSON.parse(bookingsStr) : [];
+        const bookings = bookingsStr ? JSON.parse(bookingsStr) : [];
+        bookings.forEach(b => {
+            if (!b.status) b.status = "upcoming";
+        });
+        return bookings;
     } catch (e) {
         console.error("Failed to load customer bookings", e);
         return [];
@@ -329,11 +333,13 @@ function renderBookingsLog(venue) {
         return;
     }
 
-    // Calculate total remaining collection amount
+    // Calculate total remaining collection amount (excluding completed bookings)
     let totalRemainingToReceive = 0;
     dayBookings.forEach(b => {
-        const remaining = b.remainingBalance !== undefined ? b.remainingBalance : (b.totalCost - Math.round(b.totalCost * 0.1));
-        totalRemainingToReceive += remaining;
+        if (b.status !== "completed") {
+            const remaining = b.remainingBalance !== undefined ? b.remainingBalance : (b.totalCost - Math.round(b.totalCost * 0.1));
+            totalRemainingToReceive += remaining;
+        }
     });
 
     // Create a beautiful, prominent summary header card
@@ -385,12 +391,57 @@ function renderBookingsLog(venue) {
     dayBookings.forEach(b => {
         const card = document.createElement("div");
         card.className = "booking-card";
+        if (b.status === "completed") {
+            card.style.borderColor = "rgba(29, 209, 161, 0.2)";
+            card.style.background = "rgba(29, 209, 161, 0.01)";
+        }
 
         const slotsDisplay = b.slots.map(s => `${String(s).padStart(2, '0')}:00`).join(", ");
+        const remaining = b.remainingBalance !== undefined ? b.remainingBalance : (b.totalCost - Math.round(b.totalCost * 0.1));
+        const advance = b.advancePaid !== undefined ? b.advancePaid : Math.round(b.totalCost * 0.1);
+
+        let footerHTML = "";
+        if (b.status === "completed") {
+            footerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--color-text-muted);">
+                    <span>Total Reservation Value:</span>
+                    <strong style="color: #fff; font-size: 0.9rem;">₹${b.totalCost}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--color-owner-green);">
+                    <span><i class="fa-solid fa-circle-check"></i> 10% Advance Paid Online:</span>
+                    <strong>₹${advance}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; background: rgba(29, 209, 161, 0.08); padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid rgba(29, 209, 161, 0.15); margin-top: 4px;">
+                    <span style="color: var(--color-owner-green); font-weight: 600;"><i class="fa-solid fa-check-double"></i> Remaining Collected at Venue:</span>
+                    <strong style="color: var(--color-owner-green); font-size: 1.05rem; font-weight: 800;">₹${remaining}</strong>
+                </div>
+                <div style="margin-top: 0.5rem; background: rgba(29, 209, 161, 0.12); color: var(--color-owner-green); font-weight: 700; font-size: 0.8rem; padding: 0.6rem; border-radius: 8px; text-align: center; border: 1px solid rgba(29, 209, 161, 0.25); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                    <i class="fa-solid fa-circle-check"></i> Payment Received & Completed
+                </div>
+            `;
+        } else {
+            footerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--color-text-muted);">
+                    <span>Total Reservation Value:</span>
+                    <strong style="color: #fff; font-size: 0.9rem;">₹${b.totalCost}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--color-owner-green);">
+                    <span><i class="fa-solid fa-circle-check"></i> 10% Advance Paid Online:</span>
+                    <strong>₹${advance}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; background: rgba(255, 159, 67, 0.08); padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid rgba(255, 159, 67, 0.15); margin-top: 4px;">
+                    <span style="color: var(--color-owner-orange); font-weight: 600;"><i class="fa-solid fa-hand-holding-dollar"></i> Collect Remaining at Venue:</span>
+                    <strong style="color: var(--color-owner-orange); font-size: 1.05rem; font-weight: 800;">₹${remaining}</strong>
+                </div>
+                <button class="slot-btn-action slot-btn-orange" style="margin-top: 0.6rem; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.65rem; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 8px;" onclick="triggerMarkPaymentReceived('${b.id}', '${b.name || fallbackName}', ${remaining})">
+                    <i class="fa-solid fa-circle-dollar-to-slot"></i> Payment Received
+                </button>
+            `;
+        }
 
         card.innerHTML = `
             <div class="booking-card-header">
-                <span class="booking-id-tag">${b.id}</span>
+                <span class="booking-id-tag" style="${b.status === 'completed' ? 'background: rgba(29, 209, 161, 0.15); color: var(--color-owner-green); border: 1px solid rgba(29, 209, 161, 0.25);' : ''}">${b.id} ${b.status === 'completed' ? '✓' : ''}</span>
                 <button class="slot-btn-action slot-btn-red" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;" onclick="triggerCancelBooking('${b.id}', '${b.venueName}', '${slotsDisplay}')">
                     <i class="fa-solid fa-trash-can"></i> Revoke Pass
                 </button>
@@ -414,18 +465,7 @@ function renderBookingsLog(venue) {
                 </div>
             </div>
             <div class="booking-card-footer" style="display: flex; flex-direction: column; gap: 0.6rem; align-items: stretch; margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid rgba(255, 255, 255, 0.05); font-family: var(--font-body);">
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--color-text-muted);">
-                    <span>Total Reservation Value:</span>
-                    <strong style="color: #fff; font-size: 0.9rem;">₹${b.totalCost}</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--color-owner-green);">
-                    <span><i class="fa-solid fa-circle-check"></i> 10% Advance Paid Online:</span>
-                    <strong>₹${b.advancePaid || Math.round(b.totalCost * 0.1)}</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; background: rgba(255, 159, 67, 0.08); padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid rgba(255, 159, 67, 0.15); margin-top: 4px;">
-                    <span style="color: var(--color-owner-orange); font-weight: 600;"><i class="fa-solid fa-hand-holding-dollar"></i> Collect Remaining at Venue:</span>
-                    <strong style="color: var(--color-owner-orange); font-size: 1.05rem; font-weight: 800;">₹${b.remainingBalance || (b.totalCost - Math.round(b.totalCost * 0.1))}</strong>
-                </div>
+                ${footerHTML}
             </div>
         `;
 
@@ -541,6 +581,23 @@ window.triggerCancelBooking = function(bookingId, venueName, formattedSlots) {
 
     refreshDashboard();
     showToast("Booking Revoked", `Customer reservation pass ${bookingId} has been successfully canceled.`);
+};
+
+// Mark payment received and set status to completed
+window.triggerMarkPaymentReceived = function(bookingId, customerName, remainingAmount) {
+    if (!confirm(`Are you sure you want to mark Booking Pass ${bookingId} for ${customerName} as Completed?\n\nThis confirms you have received the remaining balance of ₹${remainingAmount} at the venue.`)) return;
+
+    const allBookings = getCustomerBookings();
+    const updated = allBookings.map(b => {
+        if (b.id === bookingId) {
+            b.status = "completed";
+        }
+        return b;
+    });
+    saveCustomerBookings(updated);
+
+    refreshDashboard();
+    showToast("Payment Received", `Booking pass ${bookingId} has been successfully marked as completed.`);
 };
 
 // 7. TOAST NOTIFICATION MODULE
