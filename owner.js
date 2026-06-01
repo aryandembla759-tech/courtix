@@ -124,6 +124,26 @@ function bindModalListeners() {
     }
 }
 
+function normalizeToYYYYMMDD(dateObjOrStr) {
+    if (!dateObjOrStr) return "";
+    
+    if (typeof dateObjOrStr === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateObjOrStr)) {
+        return dateObjOrStr;
+    }
+    
+    try {
+        const d = new Date(dateObjOrStr);
+        if (isNaN(d.getTime())) return "";
+        
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    } catch (err) {
+        return "";
+    }
+}
+
 // 4. DATA ENGINE (LOCAL STORAGE ACCESSORS)
 function getCustomerBookings() {
     try {
@@ -213,8 +233,9 @@ function renderTimelineGrid(venue) {
     // Map customer bookings and owner blocks active for this venue & date
     const dayCustomerBookings = allCustomerBookings.filter(b => {
         const isMatchVenue = b.venueId === venue.id;
-        const isMatchDate = b.rawDate === ownerState.selectedDate || 
-                            new Date(b.date).toLocaleDateString() === new Date(ownerState.selectedDate).toLocaleDateString();
+        const bDateNormal = b.rawDate || normalizeToYYYYMMDD(b.date);
+        const ownerDateNormal = normalizeToYYYYMMDD(ownerState.selectedDate);
+        const isMatchDate = bDateNormal === ownerDateNormal;
         return isMatchVenue && isMatchDate;
     });
 
@@ -329,8 +350,9 @@ function renderBookingsLog(venue) {
     // Filter bookings active for this venue on selected date
     const dayBookings = allCustomerBookings.filter(b => {
         const isMatchVenue = b.venueId === venue.id;
-        const isMatchDate = b.rawDate === ownerState.selectedDate || 
-                            new Date(b.date).toLocaleDateString() === new Date(ownerState.selectedDate).toLocaleDateString();
+        const bDateNormal = b.rawDate || normalizeToYYYYMMDD(b.date);
+        const ownerDateNormal = normalizeToYYYYMMDD(ownerState.selectedDate);
+        const isMatchDate = bDateNormal === ownerDateNormal;
         return isMatchVenue && isMatchDate;
     });
 
@@ -497,8 +519,9 @@ function updateStats(venue) {
     // Map bookings and blocks active for this venue on selected date
     const dayCustomerBookings = allCustomerBookings.filter(b => {
         const isMatchVenue = b.venueId === venue.id;
-        const isMatchDate = b.rawDate === ownerState.selectedDate || 
-                            new Date(b.date).toLocaleDateString() === new Date(ownerState.selectedDate).toLocaleDateString();
+        const bDateNormal = b.rawDate || normalizeToYYYYMMDD(b.date);
+        const ownerDateNormal = normalizeToYYYYMMDD(ownerState.selectedDate);
+        const isMatchDate = bDateNormal === ownerDateNormal;
         return isMatchVenue && isMatchDate;
     });
 

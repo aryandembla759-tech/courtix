@@ -393,6 +393,26 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // 4. STORAGE SYNCING
+function normalizeToYYYYMMDD(dateObjOrStr) {
+    if (!dateObjOrStr) return "";
+    
+    if (typeof dateObjOrStr === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateObjOrStr)) {
+        return dateObjOrStr;
+    }
+    
+    try {
+        const d = new Date(dateObjOrStr);
+        if (isNaN(d.getTime())) return "";
+        
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    } catch (err) {
+        return "";
+    }
+}
+
 function loadStateFromStorage() {
     try {
         const bookings = localStorage.getItem("courtix_direct_bookings");
@@ -1093,8 +1113,9 @@ function generateSlotGrids(venue) {
         const allBookings = bookingsStr ? JSON.parse(bookingsStr) : [];
         allBookings.forEach(b => {
             const isMatchVenue = b.venueId === venue.id;
-            const isMatchDate = b.rawDate === appState.selectedDate || 
-                                new Date(b.date).toLocaleDateString() === new Date(appState.selectedDate).toLocaleDateString();
+            const bDateNormal = b.rawDate || normalizeToYYYYMMDD(b.date);
+            const selectedDateNormal = normalizeToYYYYMMDD(appState.selectedDate);
+            const isMatchDate = bDateNormal === selectedDateNormal;
             if (isMatchVenue && isMatchDate && b.slots) {
                 realBookedSlots = realBookedSlots.concat(b.slots);
             }
