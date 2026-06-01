@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courtix - Court Owner Portal</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Courtix Global Stylesheet link -->
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* Custom Owner Portal Overrides & Layout */
+        :root {
+            --color-owner-orange: #ff9f43;
+            --color-owner-orange-glow: rgba(255, 159, 67, 0.25);
+            --color-owner-red: #ff4b4b;
+            --color-owner-red-glow: rgba(255, 75, 75, 0.25);
+            --color-owner-green: #1dd1a1;
+            --color-owner-green-glow: rgba(29, 209, 161, 0.25);
+        }
+
+        body {
+            background: radial-gradient(circle at 50% 0%, #171d2b 0%, #0d1017 100%);
+            min-height: 100vh;
+            color: #fff;
+            font-family: var(--font-body);
+        }
+
+        .owner-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Top Header Styling */
+        .owner-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .owner-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .owner-logo-icon {
+            height: 42px;
+            width: 42px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px var(--color-owner-orange-glow);
+        }
+
+        .owner-title {
+            font-family: var(--font-heading);
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .owner-title span {
+            color: var(--color-owner-orange);
+        }
+
+        .owner-badge {
+            background: linear-gradient(135deg, rgba(255,159,67,0.15) 0%, rgba(255,159,67,0.05) 100%);
+            border: 1px solid var(--color-owner-orange);
+            color: var(--color-owner-orange);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px var(--color-owner-orange-glow);
+        }
+
+        /* Dashboard controls toolbar */
+        .owner-toolbar {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: center;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .toolbar-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toolbar-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .toolbar-select, .toolbar-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 0.75rem 1.2rem;
+            border-radius: 10px;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            outline: none;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            min-width: 250px;
+        }
+
+        .toolbar-select:focus, .toolbar-input:focus {
+            border-color: var(--color-owner-orange);
+            box-shadow: 0 0 10px var(--color-owner-orange-glow);
+        }
+
+        .toolbar-input {
+            min-width: 180px;
+        }
+
+        /* Status metrics row */
+        .owner-stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .owner-stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            backdrop-filter: blur(12px);
+            transition: transform 0.3s ease;
+        }
+
+        .owner-stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .owner-stat-icon {
+            height: 50px;
+            width: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .stat-orange {
+            background: rgba(255, 159, 67, 0.1);
+            border: 1px solid rgba(255, 159, 67, 0.2);
+            color: var(--color-owner-orange);
+        }
+
+        .stat-red {
+            background: rgba(255, 75, 75, 0.1);
+            border: 1px solid rgba(255, 75, 75, 0.2);
+            color: var(--color-owner-red);
+        }
+
+        .stat-green {
+            background: rgba(29, 209, 161, 0.1);
+            border: 1px solid rgba(29, 209, 161, 0.2);
+            color: var(--color-owner-green);
+        }
+
+        .owner-stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .owner-stat-num {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .owner-stat-label {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            font-weight: 500;
+        }
+
+        /* Two Column Panel Grid */
+        .owner-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .owner-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .owner-panel {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 1.8rem;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .panel-title {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .panel-title i {
+            color: var(--color-owner-orange);
+        }
+
+        /* Interactive Calendar Grid Schedule */
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.8rem;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .timeline-slot {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 0.9rem 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+        }
+
+        .timeline-slot:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+            transform: translateX(3px);
+        }
+
+        .slot-time-col {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .slot-time-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            font-family: var(--font-heading);
+        }
+
+        .slot-time-period {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+        }
+
+        .slot-status-pill {
+            padding: 0.35rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Status Styling */
+        .slot-status-available {
+            background: rgba(29, 209, 161, 0.1);
+            border: 1px solid var(--color-owner-green);
+            color: var(--color-owner-green);
+            box-shadow: 0 0 8px var(--color-owner-green-glow);
+        }
+
+        .slot-status-blocked {
+            background: rgba(255, 159, 67, 0.1);
+            border: 1px solid var(--color-owner-orange);
+            color: var(--color-owner-orange);
+            box-shadow: 0 0 8px var(--color-owner-orange-glow);
+        }
+
+        .slot-status-booked {
+            background: rgba(255, 75, 75, 0.1);
+            border: 1px solid var(--color-owner-red);
+            color: var(--color-owner-red);
+            box-shadow: 0 0 8px var(--color-owner-red-glow);
+        }
+
+        .slot-meta-info {
+            flex-grow: 1;
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-left: 1rem;
+        }
+
+        .slot-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .slot-btn-action {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .slot-btn-action:hover {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+
+        .slot-btn-orange {
+            background: rgba(255, 159, 67, 0.1);
+            border-color: rgba(255, 159, 67, 0.3);
+            color: var(--color-owner-orange);
+        }
+
+        .slot-btn-orange:hover {
+            background: var(--color-owner-orange);
+            color: #000;
+            border-color: var(--color-owner-orange);
+            box-shadow: 0 0 10px var(--color-owner-orange-glow);
+        }
+
+        .slot-btn-red {
+            background: rgba(255, 75, 75, 0.15);
+            border-color: rgba(255, 75, 75, 0.3);
+            color: var(--color-owner-red);
+        }
+
+        .slot-btn-red:hover {
+            background: var(--color-owner-red);
+            color: #fff;
+            border-color: var(--color-owner-red);
+            box-shadow: 0 0 10px var(--color-owner-red-glow);
+        }
+
+        /* Master Booking Log */
+        .bookings-log-container {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .booking-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 1.2rem;
+            position: relative;
+            transition: var(--transition-smooth);
+        }
+
+        .booking-card:hover {
+            border-color: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .booking-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .booking-id-tag {
+            font-family: var(--font-heading);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--color-owner-orange);
+            background: rgba(255, 159, 67, 0.1);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+        }
+
+        .booking-card-body {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.6rem;
+            font-size: 0.85rem;
+        }
+
+        .booking-body-row {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .booking-body-row i {
+            color: var(--color-text-muted);
+            width: 16px;
+            text-align: center;
+        }
+
+        .booking-customer-name {
+            font-weight: 700;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        .booking-card-footer {
+            margin-top: 1rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .booking-cost-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .booking-cost-title {
+            font-size: 0.7rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+        }
+
+        .booking-cost-val {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        /* Overlay modal for custom blocks */
+        .owner-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 100vw;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition-smooth);
+        }
+
+        .owner-modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .owner-modal-container {
+            background: rgba(20, 25, 36, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            width: 480px;
+            padding: 2.2rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: var(--transition-smooth);
+        }
+
+        .owner-modal.active .owner-modal-container {
+            transform: scale(1);
+        }
+
+        .owner-modal-title {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .owner-modal-title i {
+            color: var(--color-owner-orange);
+        }
+
+        .owner-modal-desc {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .owner-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .owner-form-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--color-text-muted);
+        }
+
+        .owner-form-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .owner-form-input:focus {
+            border-color: var(--color-owner-orange);
+            box-shadow: 0 0 10px var(--color-owner-orange-glow);
+        }
+
+        .owner-modal-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .owner-modal-btn {
+            flex: 1;
+            padding: 0.9rem;
+            border-radius: 12px;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .owner-modal-btn-cancel {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .owner-modal-btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .owner-modal-btn-submit {
+            background: var(--color-owner-orange);
+            color: #000;
+            box-shadow: 0 0 15px var(--color-owner-orange-glow);
+        }
+
+        .owner-modal-btn-submit:hover {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Glowing In-App Notifications */
+        #ownerToastAlert {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 100000;
+            background: rgba(20, 25, 36, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--color-owner-orange);
+            border-radius: 16px;
+            padding: 1.2rem 1.8rem;
+            box-shadow: 0 10px 30px var(--color-owner-orange-glow);
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            animation: slideInUp 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="owner-container">
+        
+        <!-- Header -->
+        <header class="owner-header">
+            <div class="owner-brand">
+                <img src="courtix_logo.png" alt="Courtix Logo" class="owner-logo-icon">
+                <div class="owner-title">COURT<span>IX</span></div>
+            </div>
+            <div class="owner-badge">🔑 Court Owner Panel</div>
+        </header>
+
+        <!-- Controls Toolbar -->
+        <div class="owner-toolbar">
+            <div class="toolbar-group">
+                <label class="toolbar-label" for="ownerVenueSelect">Select Sport Facility</label>
+                <select id="ownerVenueSelect" class="toolbar-select">
+                    <!-- Loaded dynamically in owner.js -->
+                </select>
+            </div>
+            <div class="toolbar-group">
+                <label class="toolbar-label" for="ownerDateSelect">Select Operating Date</label>
+                <input type="date" id="ownerDateSelect" class="toolbar-input">
+            </div>
+            <a href="index.html" class="slot-btn-action" style="margin-left: auto; text-decoration: none; padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                <i class="fa-solid fa-arrow-left"></i> Back to Main Website
+            </a>
+        </div>
+
+        <!-- Performance Stats Cards -->
+        <div class="owner-stats-row">
+            <div class="owner-stat-card">
+                <div class="owner-stat-icon stat-red">
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+                <div class="owner-stat-info">
+                    <span class="owner-stat-num" id="statCustomerBookedCount">0</span>
+                    <span class="owner-stat-label">Active Customer Bookings</span>
+                </div>
+            </div>
+            <div class="owner-stat-card">
+                <div class="owner-stat-icon stat-orange">
+                    <i class="fa-solid fa-ban"></i>
+                </div>
+                <div class="owner-stat-info">
+                    <span class="owner-stat-num" id="statOwnerBlockedCount">0</span>
+                    <span class="owner-stat-label">Blocked/Filled Offline</span>
+                </div>
+            </div>
+            <div class="owner-stat-card">
+                <div class="owner-stat-icon stat-green">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="owner-stat-info">
+                    <span class="owner-stat-num" id="statHoursAvailableCount">0</span>
+                    <span class="owner-stat-label">Remaining Available Hours</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Two Column Control Grid -->
+        <div class="owner-grid">
+            
+            <!-- Column 1: Daily Timeline grid -->
+            <div class="owner-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <i class="fa-solid fa-calendar-day"></i>
+                        Daily Schedule & Slot Manager
+                    </h2>
+                    <span style="font-size: 0.85rem; color: var(--color-text-muted);" id="currentScheduleLabel">Today</span>
+                </div>
+                
+                <div class="timeline-grid" id="ownerTimelineGrid">
+                    <!-- Timeline hours generated dynamically by owner.js -->
+                </div>
+            </div>
+            
+            <!-- Column 2: Master Bookings log -->
+            <div class="owner-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <i class="fa-solid fa-list-check"></i>
+                        Active Reservations Log
+                    </h2>
+                    <span class="booking-id-tag" id="bookingsCountTag" style="font-size: 0.75rem;">0 Bookings</span>
+                </div>
+                
+                <div class="bookings-log-container" id="ownerBookingsLog">
+                    <!-- Cards populated dynamically by owner.js -->
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- POPUP MODAL: BLOCK SLOT FORM -->
+    <div class="owner-modal" id="blockSlotModal">
+        <div class="owner-modal-container">
+            <h3 class="owner-modal-title">
+                <i class="fa-solid fa-ban"></i>
+                Block Operating Slot
+            </h3>
+            <p class="owner-modal-desc" id="blockSlotDetails">Block Slot 12:00 for maintenance or offline walk-in booking.</p>
+            
+            <form id="blockSlotForm">
+                <div class="owner-form-group">
+                    <label class="owner-form-label" for="blockReasonInput">Reason / Offline Booking Note</label>
+                    <input type="text" id="blockReasonInput" class="owner-form-input" placeholder="e.g. Offline Client: Amit / Maintenance" required autocomplete="off">
+                </div>
+                
+                <div class="owner-modal-buttons">
+                    <button type="button" class="owner-modal-btn owner-modal-btn-cancel" id="closeBlockModalBtn">
+                        Cancel
+                    </button>
+                    <button type="submit" class="owner-modal-btn owner-modal-btn-submit">
+                        <i class="fa-solid fa-circle-check"></i> Save Block
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST ALERT secure notifier -->
+    <div id="ownerToastAlert">
+        <i class="fa-solid fa-circle-check" style="font-size: 1.8rem; color: var(--color-owner-orange);"></i>
+        <div>
+            <div style="font-weight: bold; font-size: 0.95rem; color: #fff;" id="toastTitle">Success</div>
+            <div style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: 2px;" id="toastDesc">Operation succeeded.</div>
+        </div>
+    </div>
+
+    <!-- Code logic JS sheet link -->
+    <script src="owner.js"></script>
+</body>
+</html>

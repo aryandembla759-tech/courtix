@@ -1027,11 +1027,44 @@ function generateSlotGrids(venue) {
     const startHour = venue.openHours.start;
     const endHour = venue.openHours.end;
 
-    // Simulated "Already Booked" slots
+    // A. Simulated "Already Booked" slots
     const seed = parseInt(venue.id.replace("v", "")) + parseInt(appState.selectedDate.replace(/-/g, "").slice(-2));
     const bookedSlotsList = [];
     if (seed % 2 === 0) bookedSlotsList.push(7, 8, 17, 18, 20);
     else bookedSlotsList.push(9, 10, 16, 19, 21, 22);
+
+    // B. Real Customer Bookings (all bookings in local storage)
+    let realBookedSlots = [];
+    try {
+        const bookingsStr = localStorage.getItem("courtix_direct_bookings");
+        const allBookings = bookingsStr ? JSON.parse(bookingsStr) : [];
+        allBookings.forEach(b => {
+            const isMatchVenue = b.venueId === venue.id;
+            const isMatchDate = b.rawDate === appState.selectedDate || 
+                                new Date(b.date).toLocaleDateString() === new Date(appState.selectedDate).toLocaleDateString();
+            if (isMatchVenue && isMatchDate && b.slots) {
+                realBookedSlots = realBookedSlots.concat(b.slots);
+            }
+        });
+    } catch (e) {
+        console.error("Failed to parse customer bookings", e);
+    }
+
+    // C. Owner Blocked Slots
+    let ownerBlockedSlots = [];
+    try {
+        const blocksStr = localStorage.getItem("courtix_owner_blocks");
+        const allBlocks = blocksStr ? JSON.parse(blocksStr) : [];
+        allBlocks.forEach(blk => {
+            const isMatchVenue = blk.venueId === venue.id;
+            const isMatchDate = blk.date === appState.selectedDate;
+            if (isMatchVenue && isMatchDate && blk.slots) {
+                ownerBlockedSlots = ownerBlockedSlots.concat(blk.slots);
+            }
+        });
+    } catch (e) {
+        console.error("Failed to parse owner blocks", e);
+    }
 
     for (let hour = startHour; hour < endHour; hour++) {
         const btn = document.createElement("button");
@@ -1042,9 +1075,13 @@ function generateSlotGrids(venue) {
         btn.innerText = `${formatHour} - ${nextHour}`;
         btn.setAttribute("data-hour", hour);
 
-        // Check if booked
-        if (bookedSlotsList.includes(hour)) {
+        // Check if booked (simulated, customer-booked, or owner-blocked)
+        const isBooked = bookedSlotsList.includes(hour) || 
+                         realBookedSlots.includes(hour) || 
+                         ownerBlockedSlots.includes(hour);
+        if (isBooked) {
             btn.disabled = true;
+            btn.classList.add("booked-slot");
         }
 
         // Event listener click
@@ -1222,6 +1259,7 @@ function completePaymentSuccess() {
         sport: venue.sport,
         sportLabel: venue.sportLabel,
         date: new Date(date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
+        rawDate: date,
         slots: slots,
         totalCost: finalPaidTotal,
         advancePaid: advancePaid,
