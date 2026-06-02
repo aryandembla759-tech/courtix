@@ -2620,9 +2620,8 @@ input:checked + .slider:before {
         padding: 0.5rem !important;
         gap: 0.8rem !important;
         border-radius: 16px !important;
-        max-width: 96% !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
+        width: 100% !important; /* Full width alignment to eliminate side gaps */
+        margin: 0 !important;
         height: 120px !important; /* Highly compact fixed height */
     }
     .venue-thumb {
@@ -2707,13 +2706,12 @@ input:checked + .slider:before {
         height: auto !important;
     }
     .filters-sidebar {
-        max-width: 96% !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
+        width: 100% !important; /* Full width alignment */
         box-sizing: border-box !important;
         padding: 1rem !important; /* Super compact sidebar spacing */
         gap: 1rem !important;
         border-radius: 16px !important;
+        margin: 0 0 1.5rem 0 !important; /* Visual spacing from listings below */
     }
     .filters-sidebar .filter-options {
         margin: 0 -1rem 0.5rem -1rem !important;
