@@ -2638,33 +2638,31 @@ input:checked + .slider:before {
         align-items: stretch !important;
     }
     .venue-card {
-        flex-direction: row !important;
-        align-items: center !important;
-        padding: 0.5rem !important;
-        gap: 0.8rem !important;
-        border-radius: 16px !important;
-        width: 100% !important; /* Full width alignment to eliminate side gaps */
+        flex-direction: column !important; /* Stack vertically for a beautiful, classic layout */
+        width: 100% !important;
         margin: 0 !important;
-        height: 120px !important; /* Highly compact fixed height */
+        height: auto !important; /* Auto height to prevent vertical squishing */
+        border-radius: 20px !important;
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-color) !important;
+        overflow: hidden !important;
     }
     .venue-thumb {
-        width: 100px !important;
-        height: 100px !important;
+        width: 100% !important;
+        height: 140px !important; /* Elegant compact height */
         flex-shrink: 0 !important;
-        border-radius: 12px !important;
+        border-radius: 0 !important;
     }
     .venue-details {
-        padding: 0 0.2rem 0 0 !important;
+        padding: 0.8rem 1rem !important; /* Sleek tight padding */
         display: flex !important;
         flex-direction: column !important;
-        justify-content: space-between !important;
-        height: 100% !important;
-        flex-grow: 1 !important;
-        width: calc(100% - 115px) !important;
-        gap: 0.2rem !important;
+        gap: 0.4rem !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
     .venue-card h3 {
-        font-size: 0.95rem !important;
+        font-size: 1.05rem !important;
         margin: 0 !important;
         font-weight: 700 !important;
         white-space: nowrap !important;
@@ -2672,7 +2670,7 @@ input:checked + .slider:before {
         text-overflow: ellipsis !important;
     }
     .venue-loc {
-        font-size: 0.75rem !important;
+        font-size: 0.78rem !important;
         margin-top: 0.1rem !important;
         display: flex !important;
         align-items: center !important;
@@ -2686,28 +2684,38 @@ input:checked + .slider:before {
         flex-shrink: 0 !important;
     }
     .venue-amenities {
-        display: none !important; /* Hide secondary bullet points to save vertical space */
+        display: flex !important; /* Compact display */
+        gap: 0.4rem !important;
+        flex-wrap: wrap !important;
+        margin: 0.1rem 0 !important;
+    }
+    .amenity-bullet {
+        font-size: 0.68rem !important;
+        padding: 0.15rem 0.4rem !important;
+        background: rgba(255, 255, 255, 0.02) !important;
+        border-radius: 4px !important;
+        color: var(--color-text-muted) !important;
     }
     .card-gallery-btn,
     .card-gallery-dots,
     .sport-tag {
-        display: none !important; /* Hide slideshow clutter for high fidelity */
+        display: none !important;
     }
     .rating-tag {
-        padding: 0.15rem 0.35rem !important;
-        font-size: 0.65rem !important;
-        top: 6px !important;
-        right: 6px !important;
+        padding: 0.2rem 0.5rem !important;
+        font-size: 0.7rem !important;
+        top: 10px !important;
+        right: 10px !important;
         left: auto !important;
-        border-radius: 6px !important;
+        border-radius: 20px !important;
     }
     .venue-footer {
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
-        margin-top: auto !important;
-        padding-top: 0.3rem !important;
-        border-top: none !important; /* Remove top border on mobile for cleaner look */
+        margin-top: 0.3rem !important;
+        padding-top: 0.6rem !important;
+        border-top: 1px solid var(--border-color) !important; /* Separator for premium feel */
         width: 100% !important;
     }
     .price-tag {
@@ -2715,16 +2723,16 @@ input:checked + .slider:before {
         flex-direction: column !important;
     }
     .price-tag span {
-        font-size: 0.6rem !important;
+        font-size: 0.65rem !important;
         line-height: 1.1 !important;
     }
     .price-tag strong {
-        font-size: 0.85rem !important;
+        font-size: 0.95rem !important;
         line-height: 1.1 !important;
     }
     .book-venue-btn {
-        padding: 0.35rem 0.65rem !important;
-        font-size: 0.72rem !important;
+        padding: 0.4rem 0.8rem !important;
+        font-size: 0.78rem !important;
         border-radius: 8px !important;
         height: auto !important;
     }
