@@ -2386,6 +2386,12 @@ input:checked + .slider:before {
 }
 
 @media (max-width: 768px) {
+    /* 0. Base screen level scroll prevention */
+    html, body, .app-container, .main-content {
+        overflow-x: hidden !important;
+        max-width: 100vw !important;
+    }
+
     /* 1. Sticky blurred glass header and main-content padding */
     .main-content {
         padding: 1.25rem 1.25rem 90px;
@@ -2402,6 +2408,8 @@ input:checked + .slider:before {
         padding: 0.8rem 1.25rem !important;
         border-bottom: 1px solid var(--border-color);
         margin: -1.25rem -1.25rem 1.2rem -1.25rem !important;
+        width: auto !important; /* Prevents inline width: 100% negative margins overflow! */
+        box-sizing: border-box !important;
     }
 
     /* 2. Premium iOS/Android bottom PWA-style navigation */
@@ -2604,9 +2612,19 @@ input:checked + .slider:before {
     .venues-listing-grid {
         grid-template-columns: 1fr !important;
         gap: 1.2rem !important;
+        width: 100% !important;
     }
     .venue-card {
         border-radius: 16px !important;
+        max-width: 96% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+    .filters-sidebar {
+        max-width: 96% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        box-sizing: border-box !important;
     }
     
     /* Header layout adjustments for narrow screens */
