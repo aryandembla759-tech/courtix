@@ -2640,21 +2640,21 @@ input:checked + .slider:before {
     .venue-card {
         flex-direction: row !important; /* Elegant horizontal alignment */
         align-items: center !important;
-        padding: 0.5rem !important;
-        gap: 0.8rem !important;
-        border-radius: 16px !important;
+        padding: 0.4rem !important;
+        gap: 0.6rem !important;
+        border-radius: 14px !important;
         width: 100% !important; /* Explicitly forced full-width alignment */
         margin: 0 !important;
-        height: 120px !important; /* Short, compact length */
+        height: 95px !important; /* Super compact height */
         background: var(--bg-card) !important;
         border: 1px solid var(--border-color) !important;
         overflow: hidden !important;
     }
     .venue-thumb {
-        width: 100px !important;
-        height: 100px !important; /* Symmetrical compact square */
+        width: 80px !important;
+        height: 80px !important; /* Symmetrical compact square */
         flex-shrink: 0 !important;
-        border-radius: 12px !important;
+        border-radius: 10px !important;
     }
     .venue-details {
         padding: 0 0.2rem 0 0 !important;
@@ -2663,11 +2663,11 @@ input:checked + .slider:before {
         justify-content: space-between !important;
         height: 100% !important;
         flex-grow: 1 !important;
-        width: calc(100% - 115px) !important;
-        gap: 0.2rem !important;
+        width: calc(100% - 95px) !important;
+        gap: 0.15rem !important;
     }
     .venue-card h3 {
-        font-size: 0.95rem !important;
+        font-size: 0.88rem !important;
         margin: 0 !important;
         font-weight: 700 !important;
         white-space: nowrap !important;
@@ -2675,11 +2675,11 @@ input:checked + .slider:before {
         text-overflow: ellipsis !important;
     }
     .venue-loc {
-        font-size: 0.75rem !important;
-        margin-top: 0.1rem !important;
+        font-size: 0.68rem !important;
+        margin-top: 0.05rem !important;
         display: flex !important;
         align-items: center !important;
-        gap: 0.3rem !important;
+        gap: 0.25rem !important;
         white-space: nowrap !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
@@ -2697,19 +2697,19 @@ input:checked + .slider:before {
         display: none !important;
     }
     .rating-tag {
-        padding: 0.15rem 0.35rem !important;
-        font-size: 0.65rem !important;
-        top: 6px !important;
-        right: 6px !important;
+        padding: 0.1rem 0.25rem !important;
+        font-size: 0.6rem !important;
+        top: 4px !important;
+        right: 4px !important;
         left: auto !important;
-        border-radius: 6px !important;
+        border-radius: 5px !important;
     }
     .venue-footer {
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
         margin-top: auto !important;
-        padding-top: 0.3rem !important;
+        padding-top: 0.15rem !important;
         border-top: none !important; /* Borderless for cleaner rows */
         width: 100% !important;
     }
@@ -2718,17 +2718,17 @@ input:checked + .slider:before {
         flex-direction: column !important;
     }
     .price-tag span {
-        font-size: 0.6rem !important;
+        font-size: 0.55rem !important;
         line-height: 1.1 !important;
     }
     .price-tag strong {
-        font-size: 0.85rem !important;
+        font-size: 0.78rem !important;
         line-height: 1.1 !important;
     }
     .book-venue-btn {
-        padding: 0.35rem 0.65rem !important;
-        font-size: 0.72rem !important;
-        border-radius: 8px !important;
+        padding: 0.25rem 0.5rem !important;
+        font-size: 0.68rem !important;
+        border-radius: 6px !important;
         height: auto !important;
     }
     .filters-sidebar {
