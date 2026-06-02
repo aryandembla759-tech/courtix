@@ -2503,6 +2503,7 @@ input:checked + .slider:before {
         justify-content: center !important;
         padding: 0 !important;
         overflow-y: hidden !important;
+        overflow-x: hidden !important;
     }
     
     .modal-container {
@@ -2511,6 +2512,7 @@ input:checked + .slider:before {
         position: relative !important;
         max-height: 88vh !important;
         overflow-y: auto !important;
+        overflow-x: hidden !important;
         border-radius: 24px 24px 0 0 !important;
         margin: 0 !important;
         padding: 1.2rem 1.4rem 2.6rem 1.4rem !important;
@@ -2549,8 +2551,9 @@ input:checked + .slider:before {
     }
     
     .slots-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr !important;
         gap: 0.5rem !important;
+        overflow-x: hidden !important;
     }
     .slot-btn {
         padding: 0.75rem 0.5rem !important;
@@ -2596,7 +2599,9 @@ input:checked + .slider:before {
     }
 
     /* 5. Swipeable featured venues or single vertical grids */
-    .featured-grid {
+    .featured-grid,
+    .venues-grid-horizontal,
+    .venues-listing-grid {
         grid-template-columns: 1fr !important;
         gap: 1.2rem !important;
     }
