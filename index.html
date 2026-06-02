@@ -75,10 +75,15 @@
                     </div>
                 </div>
                 <div class="header-right" style="display: flex; align-items: center; gap: 1rem;">
-
+                    
                     <div class="notification-bell">
                         <i class="fa-solid fa-bell"></i>
                         <span class="notification-indicator"></span>
+                    </div>
+
+                    <!-- Profile Avatar Header Shortcut for Mobile/Desktop Quick Login -->
+                    <div class="header-avatar" id="headerProfileAvatar" style="cursor: pointer; position: relative; width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 1.5px solid rgba(197, 255, 26, 0.25); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(197, 255, 26, 0.1); transition: var(--transition-smooth);" onclick="openAuthModal()" title="My Profile / Sign In">
+                        <i class="fa-solid fa-user" style="font-size: 1.15rem; color: var(--color-text-muted);" id="headerAvatarIcon"></i>
                     </div>
                 </div>
             </header>
@@ -352,6 +357,7 @@
     <!-- MAIN OVERLAY MODAL: COURT DETAIL & BOOKING ENGINE (Simplified) -->
     <div class="modal-overlay" id="bookingModal">
         <div class="modal-container glass-panel">
+            <div class="mobile-drawer-handle"></div>
             <button class="modal-close" id="closeBookingModalBtn"><i class="fa-solid fa-xmark"></i></button>
             
             <div class="modal-split-layout">
@@ -443,6 +449,7 @@
     <!-- MOCK TRANSACTION & CHECKOUT OVERLAY (Simplified) -->
     <div class="modal-overlay" id="checkoutModal">
         <div class="modal-container glass-panel modal-medium">
+            <div class="mobile-drawer-handle"></div>
             <button class="modal-close" id="closeCheckoutBtn"><i class="fa-solid fa-xmark"></i></button>
             
             <div class="checkout-header text-center">
@@ -549,6 +556,7 @@
     <!-- BOOKING SUCCESS & DIGITAL BOARDING PASS MODAL (Simplified) -->
     <div class="modal-overlay" id="successModal">
         <div class="modal-container glass-panel modal-medium">
+            <div class="mobile-drawer-handle"></div>
             <div class="success-banner text-center">
                 <div class="success-icon-circle"><i class="fa-solid fa-circle-check"></i></div>
                 <h2>Booking Confirmed!</h2>
@@ -624,6 +632,7 @@
     <!-- AUTHENTICATION & REGISTRATION MODAL (Sleek Sporty Glassmorphism) -->
     <div class="modal-overlay" id="authModal">
         <div class="modal-container glass-panel modal-medium" style="max-width: 420px; padding: 2.2rem;">
+            <div class="mobile-drawer-handle"></div>
             <button class="modal-close" id="closeAuthModalBtn"><i class="fa-solid fa-xmark"></i></button>
             
             <div class="auth-header text-center" style="margin-bottom: 1.5rem;">

@@ -1394,6 +1394,9 @@ function updateUserUIState() {
     const mobileText = document.getElementById("mobileUserText");
     const mobileIcon = document.getElementById("mobileUserIcon");
 
+    const headerAvatar = document.getElementById("headerProfileAvatar");
+    const headerAvatarIcon = document.getElementById("headerAvatarIcon");
+
     if (appState.currentUser) {
         if (nameEl) nameEl.innerText = appState.currentUser.name;
         
@@ -1415,6 +1418,19 @@ function updateUserUIState() {
         // Update mobile bottom nav
         if (mobileText) mobileText.innerText = "Sign Out";
         if (mobileIcon) mobileIcon.className = "fa-solid fa-right-from-bracket gold-text";
+
+        // Update header avatar shortcut
+        if (headerAvatar && headerAvatarIcon) {
+            headerAvatar.style.borderColor = "var(--color-gold)";
+            headerAvatar.style.boxShadow = "0 0 12px rgba(197, 255, 26, 0.4)";
+            headerAvatarIcon.style.color = "var(--color-gold)";
+            headerAvatarIcon.className = "fa-solid fa-user-check";
+            headerAvatar.onclick = () => {
+                if (confirm("Are you sure you want to log out from your Courtix account?")) {
+                    logoutUser();
+                }
+            };
+        }
     } else {
         if (nameEl) nameEl.innerText = "Guest Player";
         if (levelEl) levelEl.innerText = "Click to Sign In";
@@ -1427,6 +1443,15 @@ function updateUserUIState() {
         // Update mobile bottom nav
         if (mobileText) mobileText.innerText = "Sign In";
         if (mobileIcon) mobileIcon.className = "fa-solid fa-user";
+
+        // Update header avatar shortcut
+        if (headerAvatar && headerAvatarIcon) {
+            headerAvatar.style.borderColor = "rgba(197, 255, 26, 0.25)";
+            headerAvatar.style.boxShadow = "0 0 10px rgba(197, 255, 26, 0.1)";
+            headerAvatarIcon.style.color = "var(--color-text-muted)";
+            headerAvatarIcon.className = "fa-solid fa-user";
+            headerAvatar.onclick = () => openAuthModal();
+        }
     }
 }
 
