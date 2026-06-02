@@ -2638,36 +2638,32 @@ input:checked + .slider:before {
         align-items: stretch !important;
     }
     .venue-card {
-        flex-direction: row !important; /* Elegant horizontal alignment */
-        align-items: center !important;
-        padding: 0.4rem !important;
-        gap: 0.6rem !important;
-        border-radius: 14px !important;
-        width: 100% !important; /* Explicitly forced full-width alignment */
-        margin: 0 !important;
-        height: 95px !important; /* Super compact height */
+        flex-direction: column !important; /* Vertical column stack */
+        width: 88% !important; /* Smaller horizontal width */
+        max-width: 330px !important; /* Prevents stretching too wide */
+        margin: 0 auto !important; /* Centered layout */
+        height: auto !important; /* Bigger vertical length/height */
+        border-radius: 20px !important;
         background: var(--bg-card) !important;
         border: 1px solid var(--border-color) !important;
         overflow: hidden !important;
     }
     .venue-thumb {
-        width: 80px !important;
-        height: 80px !important; /* Symmetrical compact square */
+        width: 100% !important;
+        height: 150px !important; /* Shorter than desktop (180px) but tall enough for a premium vertical card */
         flex-shrink: 0 !important;
-        border-radius: 10px !important;
+        border-radius: 0 !important;
     }
     .venue-details {
-        padding: 0 0.2rem 0 0 !important;
+        padding: 0.8rem 1rem !important; /* Sleek compact vertical padding */
         display: flex !important;
         flex-direction: column !important;
-        justify-content: space-between !important;
-        height: 100% !important;
-        flex-grow: 1 !important;
-        width: calc(100% - 95px) !important;
-        gap: 0.15rem !important;
+        gap: 0.4rem !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
     .venue-card h3 {
-        font-size: 0.88rem !important;
+        font-size: 1.05rem !important;
         margin: 0 !important;
         font-weight: 700 !important;
         white-space: nowrap !important;
@@ -2675,11 +2671,11 @@ input:checked + .slider:before {
         text-overflow: ellipsis !important;
     }
     .venue-loc {
-        font-size: 0.68rem !important;
-        margin-top: 0.05rem !important;
+        font-size: 0.78rem !important;
+        margin-top: 0.1rem !important;
         display: flex !important;
         align-items: center !important;
-        gap: 0.25rem !important;
+        gap: 0.3rem !important;
         white-space: nowrap !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
@@ -2689,7 +2685,7 @@ input:checked + .slider:before {
         flex-shrink: 0 !important;
     }
     .venue-amenities {
-        display: none !important; /* Hide secondary bullet points on mobile for maximum row space */
+        display: none !important; /* Hide secondary bullets to keep vertical height extremely clean */
     }
     .card-gallery-btn,
     .card-gallery-dots,
@@ -2697,20 +2693,20 @@ input:checked + .slider:before {
         display: none !important;
     }
     .rating-tag {
-        padding: 0.1rem 0.25rem !important;
-        font-size: 0.6rem !important;
-        top: 4px !important;
-        right: 4px !important;
+        padding: 0.2rem 0.5rem !important;
+        font-size: 0.7rem !important;
+        top: 10px !important;
+        right: 10px !important;
         left: auto !important;
-        border-radius: 5px !important;
+        border-radius: 20px !important;
     }
     .venue-footer {
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
-        margin-top: auto !important;
-        padding-top: 0.15rem !important;
-        border-top: none !important; /* Borderless for cleaner rows */
+        margin-top: 0.3rem !important;
+        padding-top: 0.6rem !important;
+        border-top: 1px solid var(--border-color) !important; /* Clean separator line */
         width: 100% !important;
     }
     .price-tag {
@@ -2718,26 +2714,27 @@ input:checked + .slider:before {
         flex-direction: column !important;
     }
     .price-tag span {
-        font-size: 0.55rem !important;
+        font-size: 0.65rem !important;
         line-height: 1.1 !important;
     }
     .price-tag strong {
-        font-size: 0.78rem !important;
+        font-size: 0.95rem !important;
         line-height: 1.1 !important;
     }
     .book-venue-btn {
-        padding: 0.25rem 0.5rem !important;
-        font-size: 0.68rem !important;
-        border-radius: 6px !important;
+        padding: 0.4rem 0.8rem !important;
+        font-size: 0.78rem !important;
+        border-radius: 8px !important;
         height: auto !important;
     }
     .filters-sidebar {
-        width: 100% !important; /* Full width alignment */
+        width: 88% !important; /* Same narrower width to match cards perfectly */
+        max-width: 330px !important;
+        margin: 0 auto 1.5rem auto !important; /* Centered layout with bottom separation spacing */
         box-sizing: border-box !important;
         padding: 1rem !important; /* Super compact sidebar spacing */
         gap: 1rem !important;
         border-radius: 16px !important;
-        margin: 0 0 1.5rem 0 !important; /* Visual spacing from listings below */
     }
     .filters-sidebar .filter-options {
         margin: 0 -1rem 0.5rem -1rem !important;
