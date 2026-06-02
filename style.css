@@ -2611,20 +2611,120 @@ input:checked + .slider:before {
     .venues-grid-horizontal,
     .venues-listing-grid {
         grid-template-columns: 1fr !important;
-        gap: 1.2rem !important;
+        gap: 0.8rem !important; /* Pack cards tighter together */
         width: 100% !important;
     }
     .venue-card {
+        flex-direction: row !important;
+        align-items: center !important;
+        padding: 0.5rem !important;
+        gap: 0.8rem !important;
         border-radius: 16px !important;
         max-width: 96% !important;
         margin-left: auto !important;
         margin-right: auto !important;
+        height: 120px !important; /* Highly compact fixed height */
+    }
+    .venue-thumb {
+        width: 100px !important;
+        height: 100px !important;
+        flex-shrink: 0 !important;
+        border-radius: 12px !important;
+    }
+    .venue-details {
+        padding: 0 0.2rem 0 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        height: 100% !important;
+        flex-grow: 1 !important;
+        width: calc(100% - 115px) !important;
+        gap: 0.2rem !important;
+    }
+    .venue-card h3 {
+        font-size: 0.95rem !important;
+        margin: 0 !important;
+        font-weight: 700 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+    .venue-loc {
+        font-size: 0.75rem !important;
+        margin-top: 0.1rem !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.3rem !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        width: 100% !important;
+    }
+    .venue-loc a {
+        flex-shrink: 0 !important;
+    }
+    .venue-amenities {
+        display: none !important; /* Hide secondary bullet points to save vertical space */
+    }
+    .card-gallery-btn,
+    .card-gallery-dots,
+    .sport-tag {
+        display: none !important; /* Hide slideshow clutter for high fidelity */
+    }
+    .rating-tag {
+        padding: 0.15rem 0.35rem !important;
+        font-size: 0.65rem !important;
+        top: 6px !important;
+        right: 6px !important;
+        left: auto !important;
+        border-radius: 6px !important;
+    }
+    .venue-footer {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        margin-top: auto !important;
+        padding-top: 0.3rem !important;
+        border-top: none !important; /* Remove top border on mobile for cleaner look */
+        width: 100% !important;
+    }
+    .price-tag {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    .price-tag span {
+        font-size: 0.6rem !important;
+        line-height: 1.1 !important;
+    }
+    .price-tag strong {
+        font-size: 0.85rem !important;
+        line-height: 1.1 !important;
+    }
+    .book-venue-btn {
+        padding: 0.35rem 0.65rem !important;
+        font-size: 0.72rem !important;
+        border-radius: 8px !important;
+        height: auto !important;
     }
     .filters-sidebar {
         max-width: 96% !important;
         margin-left: auto !important;
         margin-right: auto !important;
         box-sizing: border-box !important;
+        padding: 1rem !important; /* Super compact sidebar spacing */
+        gap: 1rem !important;
+        border-radius: 16px !important;
+    }
+    .filters-sidebar .filter-options {
+        margin: 0 -1rem 0.5rem -1rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    .filter-group {
+        gap: 0.5rem !important;
+    }
+    .filter-group h3 {
+        font-size: 1rem !important;
     }
     
     /* Header layout adjustments for narrow screens */
